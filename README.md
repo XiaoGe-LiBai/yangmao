@@ -58,32 +58,32 @@ X-Gorgon 和 X-Khronos 的值
 
 * dyxw.js 
 
-笛扬新闻 【域名：api.csp.chinamcloud.com 随便刷新下新闻 请求连接】
+    笛扬新闻APP 【域名：api.csp.chinamcloud.com 随便刷新下新闻 请求连接】
 
-环境变量:export dyxwhd='token&userid&username'
+    环境变量:export dyxwhd='token&userid&username'
 
 * hafo.js 
 
-哈佛智家
+    哈佛智家APP
 
 export hafohd = '账号&密码'
 
 * hy.js 
 
-浩阅免费小说 【运行空白请安装 jsrsasign 依赖 无需抓包 打开我的 个人信息 账号id 填到变量内】
+    浩阅免费小说 【运行空白请安装 jsrsasign 依赖 无需抓包 打开我的 个人信息 账号id 填到变量内】
 
-环境变量:export hyck='个人信息 账号id '
+    环境变量:export hyck='个人信息 账号id '
 
 * lhtj.js 
 
-小程序 龙湖天街 e
-xport lzhd='X-LF-UserToken'
+    小程序 龙湖天街 
+    export lzhd='X-LF-UserToken'
 
 * maoren.js 
 
-小程序 猫人会员商城 【移除小程序 重新登录 域名：buyer/mini-program/auto-login 返回文本里的refreshToken 有效期半个月 期间别登录小程序】
+    小程序 猫人会员商城 【移除小程序 重新登录 域名：buyer/mini-program/auto-login 返回文本里的refreshToken 有效期半个月 期间别登录小程序】
 
-环境变量:export mrhd='refreshToken'
+    环境变量:export mrhd='refreshToken'
 
 ## 使用方法
 
