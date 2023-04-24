@@ -8,6 +8,7 @@ export mrhd='refreshToken'
 一定写在配置文件里
 多号@隔开
 有效期半个月 期间别登录小程序
+cron: 50 10 * * *
 */
  const { log } = require("console");
 
