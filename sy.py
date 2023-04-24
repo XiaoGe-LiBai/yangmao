@@ -1,4 +1,5 @@
-const $ = new Env('书亦烧仙草签到');
+#cron: 20 9 * * *
+#const $ = new Env("书亦烧仙草签到");
 """
 1. 书亦烧仙草签到 抓包scrm-prod.shuyi.org.cn域名请求头里的auth
    脚本仅供学习交流使用, 请在下载后24h内删除
