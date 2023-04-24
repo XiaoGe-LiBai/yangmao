@@ -3,6 +3,7 @@
 设置密码登录
 变量
 export hafohd = '账号&密码'
+cron: 0 6 * * *
 */
 const $ = new Env('哈佛智家');
 const axios = require('axios');
