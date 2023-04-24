@@ -4,6 +4,7 @@ APP:https://console.csp.chinamcloud.com/frontcommon/invitationCodeShare.html?dow
 域名：api.csp.chinamcloud.com
 随便刷新下新闻 请求连接
 变量：export dyxwhd='token&userid&username'
+cron: 30 8 * * *
 */
 const $ = new Env('笛扬新闻');
 const axios = require('axios');
