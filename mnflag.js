@@ -5,6 +5,7 @@
 抓域名member-api.mengniu.cn
 请求头X-Token
 请求连接 unionId
+cron: 10 9 * * *
 变量
 export mnflaghd='X-Token&unionId'
 */
