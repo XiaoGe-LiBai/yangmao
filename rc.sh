@@ -1,7 +1,8 @@
-#!/bin/bash
+
 #抓包域名oneapph5.dongfeng-nissan.com.cn 填写以下变量 多个账号的数据用空格隔开，任务积分有限，最好定时早点做
 #By-莫老师 
-
+#cron: 30 6 * * *
+#const $ = new Env('日产智联');
 
 ###变量填写区开始
 sign=(688509541cbb443b67eef36aa0800a817c429f433e24bb4b890c54a83563658d1cd2fc0395c9f68cc12e257e9c9a5dd8860814381ce542850b182cca2266a2c)
