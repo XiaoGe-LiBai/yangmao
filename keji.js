@@ -14,6 +14,7 @@
  * 
  * 变量格式: export keji_ck='手机号&密码'   ,多账号用 换行 或 @ 分割
  * 定时每天一次
+ * cron: 30 7 * * *
  */
 
  const { log } = require("console");
