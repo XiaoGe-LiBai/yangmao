@@ -1,7 +1,10 @@
-//阿里云盘连续签到活动
-//https://alist.nn.ci/zh/guide/drivers/aliyundrive.html 打开页面扫码获取refresh_token
-//环境变量:ALI_TOKEN,多账号用换行或,或@或&分隔
-
+/*
+阿里云盘连续签到活动
+https://alist.nn.ci/zh/guide/drivers/aliyundrive.html 打开页面扫码获取refresh_token
+环境变量:ALI_TOKEN,多账号用换行或,或@或&分隔
+cron: 30 6 * * *
+const $ = new Env("阿里云盘连续签到活动");
+*/
 const $ = API();
 let refresh_token = [];
 let msg = '';
