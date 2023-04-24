@@ -2,7 +2,7 @@
 APP:https://m.reduxingke.com/down/register.html?spread=262946&incode=NINGMENG
 域名:m.reduxingke.com  
 请求头Authori-zation:XXXXXX
-
+cron: 0 8 * * *
 export rdxkhd='XXXXXX'
 */
 
