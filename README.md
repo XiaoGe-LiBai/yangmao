@@ -6,55 +6,55 @@
 
 * keji.js
 
-科技工作者之家APP 【先手动进APP开启连签180天活动，并且自己创建一个部落,抓包拿到自己部落的group_id 自己设置 本脚本内 的变量mygroupId为自己部落的id】
+    科技工作者之家APP 【先手动进APP开启连签180天活动，并且自己创建一个部落,抓包拿到自己部落的group_id 自己设置 本脚本内 的变量mygroupId为自己部落的id】
 
-环境变量:export keji_ck='手机号&密码'
+    环境变量:export keji_ck='手机号&密码'
 
 * jyj.js
 
-小程序:劲友家 【域名：jjw.jingjiu.com 请求头：Authorization：XXXXXX】 
+    小程序:劲友家 【域名：jjw.jingjiu.com 请求头：Authorization：XXXXXX】 
 
-环境变量:export jyjhd='XXXXXX'
+    环境变量:export jyjhd='XXXXXX'
 
 * aliyun_sign.js
 
-阿里云盘连续签到活动 【https://alist.nn.ci/zh/guide/drivers/aliyundrive.html 打开页面扫码获取refresh_token】 环境变量:export ALI_TOKEN='XXXXXX',多账号用换行或,或@或&分隔
+    阿里云盘连续签到活动 【https://alist.nn.ci/zh/guide/drivers/aliyundrive.html 打开页面扫码获取refresh_token】 环境变量:export ALI_TOKEN='XXXXXX',多账号用换行或,或@或&分隔
 
 * app_qqllq.js
 
-手机QQ浏览器,福利中心 【抓包变量 抓包地址 https://ugpage.html5.qq.com/ugwelfare/api/qbff/tasks/acceptCoinBankWelfare 抓包请求体里面的 qbid、userId、token 这三个值】
+    手机QQ浏览器,福利中心 【抓包变量 抓包地址 https://ugpage.html5.qq.com/ugwelfare/api/qbff/tasks/acceptCoinBankWelfare 抓包请求体里面的 qbid、userId、token 这三个值】
 
-环境变量:export soy_qqllq_data='' 变量值:qbid&userId&token&默认不填是qq,如手机就填sj,微信就填wx 例手机登录:xxx&xxx&xxx&sj 例微信登录:xxx&xxx&xxx&wx 例qq登录:xxx&xxx&xxx或者xxx&xxx&xxx&qq
+    环境变量:export soy_qqllq_data='' 变量值:qbid&userId&token&默认不填是qq,如手机就填sj,微信就填wx 例手机登录:xxx&xxx&xxx&sj 例微信登录:xxx&xxx&xxx&wx 例qq登录:xxx&xxx&xxx或者xxx&xxx&xxx&qq
 
 * chinaTelecom.js
 
-电信营业厅 【手机号#服务密码】
+    电信营业厅 【手机号#服务密码】
 
-环境变量:export chinaTelecomAccount="13888888888#123456"
+    环境变量:export chinaTelecomAccount="13888888888#123456"
 
 * chinaTelecom_exchange.js
 
-电信兑换签到话费 【每天12点兑换7天连签的话费 每累计7天签到可以兑换一次,可叠加,今天没兑换到可以下一天继续兑换
+    电信兑换签到话费 【每天12点兑换7天连签的话费 每累计7天签到可以兑换一次,可叠加,今天没兑换到可以下一天继续兑换
 
-此脚本变量跟电信营业厅的一样】
+    此脚本变量跟电信营业厅的一样】
 
-环境变量:export chinaTelecomAccount="13888888888#123456"
+    环境变量:export chinaTelecomAccount="13888888888#123456"
 
 * dyjsb.js
 
-抖音极速版 【手机必须刷有root，安装22.9版本的安卓抖音极速版，把文件libsscronet.so移动到/data/data/com.ss.android.ugc.aweme.lite/lib/目录下并给777权限，没有root的话你试试下个虚拟机，在内部按上面操作，外部小黄鸟抓包
+    抖音极速版 【手机必须刷有root，安装22.9版本的安卓抖音极速版，把文件libsscronet.so移动到/data/data/com.ss.android.ugc.aweme.lite/lib/目录下并给777权限，没有root的话你试试下个虚拟机，在内部按上面操作，外部小黄鸟抓包
 
-抓包方法：打开小黄鸟，能看到api开头的接口就可以去抓包了。看不到就重复打开抓包和抖音试试 抓包打开宝箱的接口：点击开宝箱。然后搜索 treasure_task 关键词。
+    抓包方法：打开小黄鸟，能看到api开头的接口就可以去抓包了。看不到就重复打开抓包和抖音试试 抓包打开宝箱的接口：点击开宝箱。然后搜索 treasure_task 关键词。
 
-参数全部在这个接口取。
+    参数全部在这个接口取。
 
-抓包 Cookie里的sessionid值。url里的链接（只要treasure_task?后面的全部参数）抓包请求头里面的
+    抓包 Cookie里的sessionid值。url里的链接（只要treasure_task?后面的全部参数）抓包请求头里面的
 
-X-Gorgon 和 X-Khronos 的值
+    X-Gorgon 和 X-Khronos 的值
 
-以上抓包注意要同一接口的。 拼接抓包参数 sessionid#url#X-Gorgon#X-Khronos】
+    以上抓包注意要同一接口的。 拼接抓包参数 sessionid#url#X-Gorgon#X-Khronos】
 
-环境变量:export dyjsbbf='拼接抓包参数 sessionid#url#X-Gorgon#X-Khronos'
+    环境变量:export dyjsbbf='拼接抓包参数 sessionid#url#X-Gorgon#X-Khronos'
 
 * dyxw.js 
 
