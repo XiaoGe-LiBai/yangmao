@@ -2,8 +2,9 @@
 小程序 龙湖天街
 export lzhd='X-LF-UserToken'
 别登录小程序 登录会失效需要重新抓
+cron: 50 8 * * *
 */
-const $ = new Env('龙珠');
+const $ = new Env('龙湖天街');
 const axios = require('axios');
 let request = require("request");
 request = request.defaults({
