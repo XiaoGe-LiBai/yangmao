@@ -1,3 +1,7 @@
+#/*
+#cron: 33 9 * * *
+#const $ = new Env('i茅台');
+#*/
 import datetime
 import logging
 import os
