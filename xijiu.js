@@ -7,7 +7,7 @@ export xjhd='login_code'
 比如
 export xjhd='login_code@login_code1'
 多号@隔开
-
+cron: 3 10 * * *
 */
 const $ = new Env('习酒');
 const axios = require('axios');
