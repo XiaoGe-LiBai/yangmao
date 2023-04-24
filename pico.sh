@@ -1,5 +1,5 @@
-const $ = new Env('pico');
-
+#cron: 55 8 * * *
+#const $ = new Env("pico");
 #在括号中填写cookie中的sessionid值即可，用空格隔开，最高支持10个账号
 #运行命令bash pico.sh run
 #检测命令bash pico.sh check
