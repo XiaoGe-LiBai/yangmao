@@ -3,6 +3,7 @@
 域名：jjw.jingjiu.com
 请求头：Authorization：XXXXXX
 变量：export jyjhd = 'XXXXXX'
+cron: 30 3 * * *
 */
 const $ = new Env('劲友家');
 const axios = require('axios');
