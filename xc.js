@@ -3,6 +3,8 @@
 域名：vip.heytea.com
 请求头：Authorization:XXXXXXX
 export xchd='XXXXXXX'
+cron: 15 9 * * *
+const $ = new Env("喜茶GO");
 */
 const $ = new Env('喜茶');
 const axios = require('axios');
