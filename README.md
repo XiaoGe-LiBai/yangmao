@@ -183,7 +183,7 @@
 
     环境变量：export meituanCookie="AgGZIgsYHyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-    ![image](picture/MT.png)
+    ![image](https://github.com/XiaoGe-LiBai/yangmao/blob/main/picture/MT.png)
 
 * mncjhy.js
 
@@ -223,7 +223,10 @@
 
     PICO VR
 
-    在脚本括号中填写cookie中的sessionid值即可，用空格隔开，最高支持10个账号
+    在脚本括号中填写cookie中的sessionid值即可，用空格隔开，最高支持10个账号 每天120积分
+
+    ![image](picture/PICO VR.jpg)
+
 
 * qcs.js
 
