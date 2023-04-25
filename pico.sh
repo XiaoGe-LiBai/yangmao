@@ -4,7 +4,9 @@
 #运行命令bash pico.sh run
 #检测命令bash pico.sh check
 #用青龙运行的bash换成task
-sessionid=(ck1 ck2 ck3 ck4)
+#task XiaoGe-LiBai_yangmao/pico.sh  run
+#task XiaoGe-LiBai_yangmao/pico.sh check
+sessionid=(9f83646e99d4f91d6d59b5f482543c9c f0b953fdc052ce3fa2e069195f7e6199)
 url=bbs.picovr.com
 
 run() {
