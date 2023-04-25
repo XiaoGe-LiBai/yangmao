@@ -337,6 +337,8 @@
 
     环境变量：export xlhd='cookie'  
 
+    ![image](picture/xl.jpg)
+
 * zslc.js
 
     掌上鹿城
