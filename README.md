@@ -376,7 +376,7 @@
 ### 青龙拉库
 
 ```bash
-ql repo https://user:Token@ghproxy.com/https://github.com/xiaoge1313/yangmao.git "" "utils|notify|sendNotify"
+ql repo https://user:Token@ghproxy.com/https://github.com/XiaoGe-LiBai/yangmao.git "" "utils|notify|sendNotify"
 ```
 Token获取方法
 
@@ -386,8 +386,3 @@ Token获取方法
 ## 注意事项
 
 本仓库发布的脚本及其中涉及的任何解密分析脚本，仅用于测试和学习研究，禁止用于商业用途，不能保证其合法性，准确性，完整性和有效性，请根据情况自行判断。本项目内所有资源文件，禁止任何公众号、自媒体进行任何形式的转载、发布。您必须在下载后的 24 小时内从计算机或手机中完全删除以上内容。
-
-
-
-
-![image](https://github.com/XiaoGe-LiBai/yangmao/blob/a698666f24c33386c2191193824361f79a46161e/picture/liant.jpg)
