@@ -157,6 +157,8 @@
 
     环境变量：export mrhd='refreshToken'
 
+    ![image](picture/WX-maoren.jpg)
+
 * maotai2.py
 
     i茅台
@@ -180,6 +182,8 @@
     环境变量：export meituanAutoWithdraw="false"
 
     环境变量：export meituanCookie="AgGZIgsYHyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    ![image](picture/MT.png)
 
 * mncjhy.js
 
