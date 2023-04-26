@@ -370,16 +370,6 @@
 
     应该也同上，手机抓不了包没玩
 
-* zsqy.js
-
-    掌上庆元
-
-    开着抓包软件登录，我的 抓 https://p.cztv.com 头部sessionId
-    
-    必填变量格式：export S_zsqyCk='sessionId' 多个账号用 @ 或者 换行 分割
-    
-    可选变量格式： export S_zsqyUa='User-Agent'多个账号用 @ 或者 换行 分割
-
 ## 使用方法
 
 ### 青龙拉库
