@@ -3,7 +3,7 @@
 
 格式：export dewu="token=eyJhxxxxxxxx"  多账号换行隔开
 
-cron 32 5,36 8,12,18,22 * * ? 每天跑6-8次
+cron: 32 5,36 8,12,18,22 * * ? 每天跑6-8次
 
 频道：https://t.me/+O6-uZI3t6uhhMmU1
 */
