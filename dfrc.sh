@@ -1,11 +1,11 @@
 #!/bin/bash
 #抓包小程序东风日产，域名community.dongfeng-nissan.com.cn。抓authorization的值，把前面Bearer 的去掉再填入括号内。多个账号的authorization用空格隔开，每日任务积分有限，最好定时早点做，ck有效期约两周
 #By-莫老师 
-#cron: 30 6 * * *
+#cron: 10 0 * * *
 #const $ = new Env("东风日产");
 
 ###变量填写区开始，多账号的authorization用空格隔开
-authorization=()
+authorization=(eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3d4YXBpLmRvbmdmZW5nLW5pc3Nhbi5jb20uY24vYXBpL3NtYWxsL3Y0L3Nlc3Npb24vMGQzd2hlR2ExcUQ5Y0Ywa0IzSGExRVdFZE0xd2hlR1QiLCJpYXQiOjE2ODI2NTE0NjIsImV4cCI6MTY4MjY1NTA2MiwibmJmIjoxNjgyNjUxNDYyLCJqdGkiOiJKTVlGZVM2cGtibVN0VFhqIiwic3ViIjoxMTIxMTEwOCwicHJ2IjoiMjZiMDdiMmVjOGQ2MDFmMzczNGM5NTkwY2FlNDgyNzIwMzU5ODcxNCJ9.i1t5ccoOiYjpOW4zQ46XyTFmRgofOfxPOXLuuFRzoCg)
 #wxpuzher推送参数
 topicIds=8069
 apptoken=
