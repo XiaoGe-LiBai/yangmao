@@ -2,7 +2,7 @@
 需要开沃畅游会员才有解速效果，有的人开了会员也没效果，具体自己试吧
 抓包沃畅游app，获取authorization值，填入青龙变量
 青龙变量:export WCYCK="xxxx#xxxx#xxxx"多账号换行或者#隔开
-定时：0 0/20 * * * *
+corn：0 0/20 * * * *
 妖火
 */
 const $ = new Env('沃畅游解限速');
