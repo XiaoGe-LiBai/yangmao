@@ -17,6 +17,8 @@
  * export export qlmhd='token&unionId&userId&openId'
  * 多号 @ 或换行
  * corn 0 0 * * * qcs_qlm.js
+cron: 5 8 * * *
+const $ = new Env("屈臣氏-撸猫");
  */
 
 ///////////////////////////////////////////////////////////////////
