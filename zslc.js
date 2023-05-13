@@ -165,7 +165,9 @@ class UserInfo {
             let result = await httpRequest(options, name);
             if (result.code == 0) {
                 LoginCode = result.data.authorization_code.code;
-                await this.getToken();
+                //await this.getToken();
+                login_token="9ca16ae2e6eeb7ee3b9084e1d1b23f9bb78aa3d14a879f8bb3e44ea7ae94d0cc668793c098c733fbfee4c3f12afaece4c3e72afafea083e780acbdff84e579a89a9eb6c14a829a85a6ca7ff3a69b9bd37da6b5f9a6a177"
+                await this.initSessionId();
             } else {
                 DoubleLog(`账号[${this.index}],账号登录:失败 ❌ 了呢,原因未知！`);
                 console.log(result);
