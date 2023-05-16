@@ -22,6 +22,7 @@ async function Wochangyou(authorization) {
     const url = 'https://game.wostore.cn/api/app/user/v2/qos/start';
     const headers = {
         'authorization': authorization,
+        'user-agent': 'okhttp/4.9.2',
         'content-type': 'application/json'
     };
     const body = {"channelId": "90002", "privateIp": "10.1.10.1"};
