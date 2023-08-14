@@ -6,7 +6,7 @@
  * 项目类型：小程序
  * 项目名称:热度星客
  * 项目抓包：抓m.reduxingke.com下的authorization填入变量去掉Bear
- * export LiHua_rdxk='authorization'
+ * export LiHua_rdxk='4a3734be92c7a81af75544e04be6da84'
  * 需要提现的吊毛选择提现方式  并且输入提现密码
  * 
  * 多账号用 换行 或 @ 分割

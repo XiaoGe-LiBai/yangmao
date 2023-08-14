@@ -26,11 +26,11 @@ let ck = msg = '';            //let ck,msg
 let versionupdate = "0";      //版本对比升级   0关闭  1开启
 let goodsorderNow = "8928";      //兑换物品
 //===============脚本版本=================//
-let scriptVersion = "v1.5";
+let scriptVersion = "v1.6";
 let update_tines = "2023-07-25";
 let update_data = "2023-12-12";   //测试时间
 let name_data = "10";             //脚本用户
-let scriptVersionLatest = "v1.5"; //版本对比
+let scriptVersionLatest = "v1.6"; //版本对比
 let userCookie = ($.isNode() ? process.env.lekebo_ajz_Cookie : $.getdata('lekebo_ajz_Cookie')) || '';
 let userList = [];
 let userIdx = 0;
