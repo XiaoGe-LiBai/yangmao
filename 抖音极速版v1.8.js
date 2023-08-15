@@ -2,8 +2,8 @@
  * 
  * 项目类型：APP
  * 项目名称：抖音极速版
- * 项目更新：2023-08-14
- * 项目抓包：抓api5-normal-c-lq.amemv.com下的宝箱url#cookie#x-argus#x-ladon#user-agent填入变量
+ * 项目更新：2023-08-15
+ * 项目抓包：抓 *-normal-c-lq.amemv.com下的宝箱url#cookie#x-argus#x-ladon#user-agent填入变量
  * 项目变量：lekebo_dyjsb_Cookie
  * 项目定时：每30分钟运行一次
  * 定时规则: 10 7-22 * * *
@@ -26,11 +26,11 @@ let ck = msg = '';            //let ck,msg
 let versionupdate = "0";      //版本对比升级   0关闭  1开启
 let numvodie = '88';          //循环看广告次数
 //===============脚本版本=================//
-let scriptVersion = "v1.7";
-let update_tines = "2023-08-14";
+let scriptVersion = "v1.8";
+let update_tines = "2023-08-15";
 let update_data = "2023-12-12";   //测试时间
-let scriptVersionLatest = "v1.7"; //版本对比
-let userCookie = ($.isNode() ? process.env.lekebo_dyjsb1_Cookie : $.getdata('lekebo_dyjsb1_Cookie')) || '';
+let scriptVersionLatest = "v1.8"; //版本对比
+let userCookie = ($.isNode() ? process.env.lekebo_dyjsb_Cookie : $.getdata('lekebo_dyjsb_Cookie')) || '';
 let userList = [];
 let userIdx = 0;
 let date = require('silly-datetime');
@@ -202,7 +202,6 @@ class UserInfo {
                         let result = JSON.parse(data);
                         if (result.err_no == 0) {
                         } else {
-                            //DoubleLog(`\n ❌ 【${this.index}】用户信息: ${result.err_tips}`)
                         }
                     }
                 } catch (e) {
@@ -350,15 +349,17 @@ class UserInfo {
                     if (error) {
                         $.logErr(error);
                     } else {
-                        let result = JSON.parse(data);
-						if (result.err_no == 0) {
-                            DoubleLog(`\n ✅ 【${this.index}】签到广告: 获得奖励 ${result.data.amount} 金币`);
-                        } else if (result.err_no == 10007) {
-                            await this.signin_video(adid,reqid,amount,2 * 1000);
-                        } else if (result.err_no == 10009) {
-                            await this.signin_video(adid,reqid,amount,2 * 1000);
+                        let result = isJSON(data);
+                        if (result == true) {
+                            await $.wait(1000);
+                            let result = JSON.parse(data);
+                            if (result.err_no == 0) {
+                                DoubleLog(`\n ✅ 【${this.index}】签到广告: 获得奖励 ${result.data.amount} 金币`);
+                            } else {
+                                await this.signin_video(adid,reqid,amount,2 * 1000);
+                            }
                         } else {
-                            DoubleLog(`\n ❌ 【${this.index}】签到广告: ${result.err_tips}`)
+                            await this.signin_video(adid,reqid,amount,2 * 1000);
                         }
                     }
                 } catch (e) {
@@ -389,16 +390,20 @@ class UserInfo {
                     } else {
                         let result = JSON.parse(data);
                         if (result.err_no == 0) {
-                            if (result.data.today_step > 0) {
-                                DoubleLog(`\n ✅ 【${this.index}】今日步数: 今日步数:${result.data.today_step}步，已领取${result.data.today_step_reward.reward_amount}金币`);
-                                if (result.data.today_step_reward.reward_amount == 0) {
-                                    await this.step_reward(2 * 1000);
+                            if (timeHours > 0) {
+                                if (result.data.today_step > 0) {
+                                    DoubleLog(`\n ✅ 【${this.index}】今日步数: 今日步数:${result.data.today_step}步，已领取${result.data.today_step_reward.reward_amount}金币`);
+                                    if (result.data.today_step_reward.reward_amount == 0) {
+                                        await this.step_reward(2 * 1000);
+                                    }
+                                } else {
+                                    await this.step_submit(2 * 1000);
                                 }
                             } else {
-                                await this.step_submit(2 * 1000);
+                                DoubleLog(`\n ❌ 【${this.index}】今日步数: 当前时间为系统结算期,暂不做操作。`);
                             }
                         } else {
-                            DoubleLog(`\n ❌ 【${this.index}】今日步数: ${result.err_tips}`)
+                            DoubleLog(`\n ❌ 【${this.index}】今日步数: ${result.err_tips}`);
                         }
                     }
                 } catch (e) {
@@ -465,9 +470,45 @@ class UserInfo {
                     } else {
                         let result = JSON.parse(data);
                         if (result.err_no == 0) {
-                            DoubleLog(`\n ✅ 【${this.index}】步数奖励: 获得奖励 ${result.data.reward_amount} 金币`)
+                            DoubleLog(`\n ✅ 【${this.index}】步数奖励: 获得奖励 ${result.data.reward_amount} 金币`);
+                            await this.step_video(2 * 1000);
                         } else {
                             DoubleLog(`\n ❌ 【${this.index}】步数奖励: ${result.err_tips}`)
+                        }
+                    }
+                } catch (e) {
+                    $.logErr(e, response);
+                } finally {
+                    resolve();
+                }
+            }, timeout)
+        })
+    }
+    async step_video(aggrincomeid,timeout = 2000) {
+        return new Promise((resolve) => {
+            this.forzstop = 0;
+            let url = {
+                url: `${hostname}/luckycat/aweme/v1/task/done/excitation_ad/one_more?${this.ck[0]}`,
+                headers: {
+                    Host: host,
+				    'Content-Type': 'application/json; charset=utf-8',
+                    'user-agent': this.ck[4],
+				    'Cookie': this.ck[1],
+                    'x-ladon': this.ck[3],
+                    'x-argus': this.ck[2],
+                },
+                body: `{"task_key":"walk_excitation_ad","rit":"28038","creator_id":"12317000","one_more_round":0,"aggr_income_id":"${aggrincomeid}"}`,
+            }
+            $.post(url, async (error, response, data) => {
+                try {
+                    if (error) {
+                        $.logErr(error);
+                    } else {
+                        let result = JSON.parse(data);
+						if (result.err_no == 0) {
+                            DoubleLog(`\n ✅ 【${this.index}】步数视频: 获得奖励 ${result.data.amount} 金币`);
+                        } else {
+                            await this.step_video(aggrincomeid,2 * 1000);
                         }
                     }
                 } catch (e) {
@@ -543,7 +584,7 @@ class UserInfo {
 								await $.wait(1000);
                                 await this.open_treasure(2 * 1000);
                             } else {
-                                DoubleLog(`\n ❌ 【${this.index}】打开宝箱: 下次开宝箱：${$.time('yyyy-MM-dd HH:mm:ss', next_time * 1000)}`)
+                                DoubleLog(`\n ❌ 【${this.index}】打开宝箱: 下次开宝箱：${$.time('yyyy-MM-dd HH:mm:ss', next_time * 1000)}`);
                             }
                         } else {
                             DoubleLog(`\n ❌ 【${this.index}】宝箱广告: ${result.err_tips}`)
@@ -583,7 +624,7 @@ class UserInfo {
                             let treasurereqid = result.data.excitation_ad_info.req_id;
                             DoubleLog(`\n ✅ 【${this.index}】打开宝箱: 获得奖励 ${result.data.amount} 金币`);
                             await $.wait(1000);
-                            DoubleLog(`\n ✅ 【${this.index}】宝箱广告: 预计可获得 ${treasureamount} 金币`);
+                            DoubleLog(`\n ✅ 【${this.index}】宝箱广告: 预计可获得 ${treasureamount} 金币，正在执行`);
                             await $.wait(1000);
                             await this.treasure_video(treasureamount,treasureadid,treasurereqid,2 * 1000);
                         } else {
@@ -620,6 +661,7 @@ class UserInfo {
                     } else {
                         let result = isJSON(data);
                         if (result == true) {
+                            await $.wait(1000);
                             let result = JSON.parse(data);
                             if (result.err_no == 0) {
                                 DoubleLog(`\n ✅ 【${this.index}】宝箱广告: 获得奖励 ${result.data.amount} 金币，执行宝箱追加任务`);
@@ -783,16 +825,17 @@ class UserInfo {
                     } else {
                         let result = isJSON(data);
                         if (result == true) {
+                            await $.wait(1000);
                             let result = JSON.parse(data);
                             if (result.err_no == 0) {
                                 this.aggrinfoid = result.data.aggr_info.aggr_income_id;
                                 DoubleLog(`\n ✅ 【${this.index}】视频广告: 获得奖励 ${result.data.amount} 金币`);
                                 await this.video_more_status(2 * 1000);
                             } else {
-                                await this.open_video_stop(2 * 1000);
+                                await this.open_video_stop(adid,reqid,result.amount,2 * 1000);
                             }
                         } else {
-                            await this.open_video_stop(2 * 1000);
+                            await this.open_video_stop(adid,reqid,result.amount,2 * 1000);
                         }
                     }
                 } catch (e) {
@@ -855,9 +898,15 @@ class UserInfo {
                     if (error) {
                         $.logErr(error);
                     } else {
-                        let result = JSON.parse(data);
-						if (result.err_no == 0) {
-                            DoubleLog(`\n ✅ 【${this.index}】追加奖励: 获得奖励 ${result.data.amount} 金币`);
+                        let result = isJSON(data);
+                        if (result == true) {
+                            await $.wait(1000);
+                            let result = JSON.parse(data);
+                            if (result.err_no == 0) {
+                                DoubleLog(`\n ✅ 【${this.index}】追加奖励: 获得奖励 ${result.data.amount} 金币`);
+                            } else {
+                                await this.one_moread(aggrincomeid,2 * 1000);
+                            }
                         } else {
                             await this.one_moread(aggrincomeid,2 * 1000);
                         }
@@ -1109,7 +1158,7 @@ class UserInfo {
                         let result = JSON.parse(data);
                         if (result.code == 0) {
                             DoubleLog(`\n ✅ 【${this.index}】吃饭打卡: 获得 ${result.data.reward} 金币,看视视预计 ${result.data.excitation_ad_amount} 金币`);
-                            //await this.doneeat_video(3,2 * 1000);
+                            await this.doneeat_video(2 * 1000);
                         } else {
                             DoubleLog(`\n ❌ 【${this.index}】吃饭补贴: ${result.message}`)
                         }
@@ -1142,11 +1191,17 @@ class UserInfo {
                     if (error) {
                         $.logErr(error);
                     } else {
-                        let result = JSON.parse(data);
-                        if (result.err_no == 0) {
-                            DoubleLog(`\n ✅ 【${this.index}】吃饭视频: 获得奖励 ${result.data.amount} 金币`);
+                        let result = isJSON(data);
+                        if (result == true) {
+                            await $.wait(1000);
+                            let result = JSON.parse(data);
+                            if (result.err_no == 0) {
+                                DoubleLog(`\n ✅ 【${this.index}】吃饭视频: 获得奖励 ${result.data.amount} 金币`);
+                            } else {
+                                await this.doneeat_video(2 * 1000);
+                            }
                         } else {
-                            DoubleLog(`\n ❌ 【${this.index}】吃饭视频: ${result.err_tips}`);
+                            await this.doneeat_video(2 * 1000);
                         }
                     }
                 } catch (e) {
@@ -1246,6 +1301,7 @@ class UserInfo {
         console.log(`\n================ 开始执行会员脚本 ===============`)
         await start();
     }
+    console.log(`\n================ 本次运行脚本结束 ===============`);
     //await SendMsg(msg);
 })()
     .catch((e) => console.log(e))
@@ -1296,7 +1352,6 @@ function isJSON(str) {
                 return false;
             }
         } catch(e) {
-            console.log(`\n 温馨提示：服务器返回了空信息数，从新尝试获取`);
             return false;
         }
     }
