@@ -17,6 +17,7 @@
 
 
 //--------------------   自定义变量区域 -------------------------------------
+const $ = new Env("热度星客修复提现");
 const Notify = 1;		 //0为关闭通知,1为打开通知,默认为1
 const Withdraw = 1      //提现  1 关闭 0
 let pay = 'wxpay';      //提现方式 wxpay alipay bank
