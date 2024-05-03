@@ -9,13 +9,13 @@ import requests
 import json
 
 #获取当前白名单链接
-get_white_url="http://data.yyyip.cn:8888/whiteip_api?method=list&token=ABC"
+get_white_url="http://data.yyyip.cn:8888/whiteip_api?method=list&token=6C5ED5FD9ED38548EC2756248118E083"
 
 #删除白名单链接
-del_url="http://data.yyyip.cn:8888/whiteip_api?method=del&token=ABC&ip="
+del_url="http://data.yyyip.cn:8888/whiteip_api?method=del&token=6C5ED5FD9ED38548EC2756248118E083&ip="
 
 #添加白名单链接
-add_url="http://data.yyyip.cn:8888/whiteip_api?method=add&token=ABC&ip="
+add_url="http://data.yyyip.cn:8888/whiteip_api?method=add&token=6C5ED5FD9ED38548EC2756248118E083&ip="
 
 
 def get_ip():
