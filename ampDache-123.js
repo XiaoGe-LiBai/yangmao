@@ -37,139 +37,65 @@ function s(e,t){var n,r=4-e.length%4;n=t?0==(3&e.length)?e.length>>>2:1+(e.lengt
 const $ = new Env("高德地图签到");
 const _key = 'GD_Val';
 var gdVal = $.getdata(_key) || ($.isNode() ? process.env[_key] : '');
-$.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false'; // false-true
+$.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false';//false-true
 const notify = $.isNode() ? require('./sendNotify') : '';
 var message = '';
 
-// 获取多个账号的值，并用换行符进行区分
-var gdVals = gdVal.split('\n').filter(val => val.trim() !== '');
+var node='', channel='', adiu='', userId='', actID='', playID='', sessionid='',isOk=false;
 
-// 遍历每个账号进行签到
-(async () => {
-    for (let i = 0; i < gdVals.length; i++) {
-        let account = JSON.parse(gdVals[i]);
-        await processAccount(account, i + 1);
-    }
-
-    console.log(message); // 打印日志
-    await SendMsg(message);
-})()
-.catch((e) => {
-    $.log("", `❌失败! 原因: ${e}!`, "");
-})
-.finally(() => {
-    $.done();
-});
-
-async function processAccount(account, index) {
-    let userId = account.userId;
-    let sessionid = account.sessionid;
-    let adiu = account.adiu;
-    let node = '', channel = '', actID = '', playID = '', isOk = false;
-
-    if (sessionid.length < 30) {
-        $.msg($.name, '', `❌账号${index}：请先获取sessionid🎉`);
+!(async() => {
+    if (typeof $request != "undefined") {
+        getToken();
         return;
     }
+    if (gdVal != undefined) {
+        let accounts = gdVal.split('\n');
+        for (let account of accounts) {
+            let obj = JSON.parse(account);
+            userId = obj.userId;
+            sessionid = obj.sessionid;
+            adiu = obj.adiu; 
+            if (sessionid.length < 30) {
+                $.msg($.name, '', '❌请先获取sessionid🎉');
+                return;
+            }
+            await checkInAndSign();
+        }
+    } else {
+        $.msg($.name, '', '❌请先获取sessionid🎉');
+        return;
+    }
+})()
+.catch((e) => {$.log("", `❌失败! 原因: ${e}!`, "");})
+.finally(() => {$.done();});
 
+
+async function checkInAndSign() {
     intRSA();
     intCryptoJS();
 
-    message += `----------账号${index}：微信小程序签到----------\n`;
-    node = 'wechatMP';
-    channel = 'h5_common';
-    actID = '53A31cHhhPJ';
-    playID = '53A3fQm9AM7';
-    isOk = await checkIn(userId, sessionid, adiu, node, channel, actID, playID);
-    if (isOk) await signIn(userId, sessionid, adiu, node, channel, actID, playID);
+    message += `----------微信小程序签到----------\n`;
+    node = 'wechatMP',channel = 'h5_common',actID = '53A31cHhhPJ',playID = '53A3fQm9AM7';
+    await checkIn(); isOk && (await signIn());
 
-    message += `----------账号${index}：高德地图APP签到----------\n`;
-    node = 'Amap';
-    channel = 'h5_common';
-    actID = '53m5Q2UjZ6J';
-    playID = '53m5Xt43PGU';
-    isOk = await checkIn(userId, sessionid, adiu, node, channel, actID, playID);
-    if (isOk) await signIn(userId, sessionid, adiu, node, channel, actID, playID);
+    message += `----------高德地图APP签到----------\n`;
+    node = 'Amap',channel = 'h5_common',actID = '53m5Q2UjZ6J',playID = '53m5Xt43PGU';
+    await checkIn(); isOk && (await signIn());
 
-    message += `----------账号${index}：支付宝小程序签到----------\n`;
-    node = 'alipayMini';
-    channel = 'alipay_mini';
-    actID = '53wHnt77TQ5';
-    playID = '53wHtx24q7u';
-    isOk = await checkIn(userId, sessionid, adiu, node, channel, actID, playID);
-    if (isOk) await signIn(userId, sessionid, adiu, node, channel, actID, playID);
-}
+    message += `----------支付宝小程序签到----------\n`;
+    node = 'alipayMini',channel = 'alipay_mini',actID = '53wHnt77TQ5',playID = '53wHtx24q7u';
+    await checkIn(); isOk && (await signIn());
 
-function checkIn(userId, sessionid, adiu, node, channel, actID, playID) {
-    return new Promise((resolve) => {
-        let key = getKey();
-        let sign = getSign(channel);
-        let url = 'https://m5.amap.com/ws/car-place/show?' + getQuery(node, adiu, channel, key, sign);
-        let body = getShowBody(node, channel, adiu, userId, sign, actID, playID);
-        body = getBody(body, key);
-        let headers = getHeaders(sessionid);
-        const rest = {url: url, body: body, headers: headers};
-        
-        $.post(rest, (err, resp, data) => {
-            try {
-                debug("resp查询：" + data);
-                var obj = JSON.parse(data);
-                if (obj?.code == '1') {
-                    obj?.data?.playMap?.dailySign?.signList.forEach(t => {
-                        if (t?.date == $.time('MM月dd日')) {
-                            let signTerm = obj?.data?.playMap?.dailySign?.signTerm;
-                            let signDay = t.day;
-                            let isSign = t.isSign; // isSign = 1 为签到过，懒得管了，让它再提交一次吧
-                            message += `查询:${t.date} isSign=${isSign} ${t.award.amount}里程\n`;
-                            resolve(true); // 查询结果
-                        }
-                    });
-                } else {
-                    message += `查询:${obj?.message}\n`;
-                    resolve(false); // 查询结果
-                }
-            } catch (e) {
-                $.logErr(e, "❌查询：请重新登陆更新Token");
-                resolve(false);
-            }
-        });
-    });
-}
-
-function signIn(userId, sessionid, adiu, node, channel, actID, playID, signTerm, signDay) {
-    return new Promise((resolve) => {
-        let key = getKey();
-        let sign = getSign(channel);
-        let url = 'https://m5.amap.com/ws/alice/activity/daily_sign/do_sign?' + getQuery(node, adiu, channel, key, sign);
-        let body = getSigBody(node, channel, adiu, userId, sign, actID, playID, signTerm, signDay);
-        body = getBody(body, key);
-        let headers = getHeaders(sessionid);
-        const rest = {url: url, body: body, headers: headers};
-        
-        $.post(rest, (err, resp, data) => {
-            try {
-                debug('resp签到：' + data);
-                var obj = JSON.parse(data);
-                if (obj?.code == '1') {
-                    message += `签到:签到成功\n`;
-                } else {
-                    message += `签到:${obj?.message}\n`;
-                }
-            } catch (e) {
-                $.logErr(e, "❌请重新登陆更新Token");
-            } finally {
-                resolve();
-            }
-        });
-    });
+    console.log(message); //node,青龙日志
+    await SendMsg(message);
 }
 
 function getToken() {
-    if ($request && $request.method != 'OPTIONS' && /\/common\/(alipaymini|wxmini)\?_ENCRYPT=/.test($request.url)) {
+    if ($request && $request.method != 'OPTIONS' && /\/common\/(alipaymini|wxmini)\?_ENCRYPT=/.test($request.url)) { //WX、ALI
         let ENCRYPT = $request.url.split("_ENCRYPT=")[1].split("&")[0];
         ENCRYPT = base64decode(ENCRYPT);
         let obj = {}, abc = {};
-        ENCRYPT.split('&').forEach(item => obj[item.split('=')[0]] = (item.split('=')[1]));
+        ENCRYPT.split('&').forEach(item => obj[item.split('=')[0]] = (item.split('=')[1]))
         abc.userId = obj.userId;
         abc.adiu = obj.deviceId;
         abc.sessionid = obj.sessionId;
@@ -177,9 +103,9 @@ function getToken() {
             $.setdata(JSON.stringify(abc), _key);
             $.msg($.name, '从小程序获取签到sessionid成功🎉', $.toStr(abc));
         }
-    } else if ($request && $request.method != 'OPTIONS') {
+    } else if ($request && $request.method != 'OPTIONS') { //WX、ALI、APP
         let abc = {};
-        let obj = JSON.parse($response.body);
+		let obj = JSON.parse($response.body);
         abc.userId = obj.content.uid;
         abc.adiu = obj.content.adiu;
         let hed = $request.headers;
@@ -359,6 +285,7 @@ function signIn() {
 async function SendMsg(message){$.isNode()?await notify.sendNotify($.name,message):$.msg($.name,"",message);}
 //DEBUG
 function debug(text){if($.is_debug==='true'){if(typeof text=="string"){console.log(text);}else if(typeof text=="object"){console.log($.toStr(text));}}}
+
 
 
 
