@@ -36,11 +36,13 @@ function s(e,t){var n,r=4-e.length%4;n=t?0==(3&e.length)?e.length>>>2:1+(e.lengt
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 const $ = new Env("高德地图签到");
 const _key = 'GD_Val';
+var gdVal = $.getdata(_key) || ($.isNode() ? process.env[_key] : '');
+$.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false'; // false-true
 const notify = $.isNode() ? require('./sendNotify') : '';
 var message = '';
 
 // 获取多个账号的值，并用换行符进行区分
-var gdVals = ($.getdata(_key) || ($.isNode() ? process.env[_key] : '')).split('\n').filter(val => val.trim() !== '');
+var gdVals = gdVal.split('\n').filter(val => val.trim() !== '');
 
 // 遍历每个账号进行签到
 (async () => {
@@ -198,8 +200,160 @@ function getToken() {
     }
 }
 
-// 其他函数保持不变
+function getKey() {
+    for (var t = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678', n = t.length, r = "", i = 0; i < 16; i++)
+        r += t.charAt(Math.floor(Math.random() * n));
+    return r
+}
+function getSign(channel) {
+    const sign = channel + '@oEEln6dQJK7lRfGxQjlyGthZ4loXcRHR'
+    return md5(sign).toUpperCase()
+}
+function getQuery(node, adiu,channel, key, sign) {
+    let xck = RSA_Public_Encrypt(key);
+    let _in = {
+        "channel": channel,
+        "sign": sign
+    };
+    _in = Encrypt_Body(Json2Form(_in), key);
+    let query = {
+        "adiu": adiu,
+        "node": node,
+        "env": "prod",
+        "xck_channel": "default",
+        "xck": encodeURIComponent(xck),
+        "in": encodeURIComponent(_in)
+    }
+    return Json2Form(query)
+}
 
+function getBody(body,key) {
+    body = 'in=' + encodeURIComponent(Encrypt_Body(Json2Form(body), key));
+    return body
+}
+function getHeaders(sessionid) {
+    return {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 amap/12.13.1.2034 AliApp(amap/12.13.1.2034) NetType/WiFi',
+        'sessionid': sessionid
+    }
+}
+
+function getShowBody(node, channel,adiu, userId, sign, actID, playIDs) {
+    return {
+        "bizVersion": "060800",
+        "h5version": "6.80.17",
+        "platform": "ios",
+        "tid": adiu,
+        "eId": "",
+        "adiu": adiu,
+        "diu": adiu,
+        "imei": adiu,
+        "idfa": adiu,
+        "enterprise": "0",
+        "ts": new Date().getTime(),
+        "uid": userId,
+        "userId": userId,
+        "channel": channel,
+        "dip": "20020",
+        "adCode": "",
+        "actID": actID,
+        "playTypes": "dailySign",
+        "playIDs": playIDs,
+        "node": node,
+        "sign": sign
+    }
+}
+function getSigBody(node, channel, adiu, userId, sign, actID, playID, signTerm, signDay) {
+    return{
+        "bizVersion": "060800",
+        "h5version": "6.80.17",
+        "platform": "ios",
+        "tid": adiu,
+        "eId": "",
+        "adiu": adiu,
+        "diu": adiu,
+        "imei": adiu,
+        "idfa": adiu,
+        "enterprise": "0",
+        "ts": new Date().getTime(),
+        "uid": userId,
+        "userId": userId,
+        "channel": channel,
+        "dip": "20020",
+        "actID": actID,
+        "playID": playID,
+        "signTerm": signTerm,
+        "signType": "1",
+        "signDay": signDay,
+        "adCode": "",
+        "node": node,
+        "div": "",
+        "sign": sign
+    }
+}
+
+function checkIn() {
+    return new Promise((resove) => {
+        key = getKey();
+        sign = getSign(channel);
+        url= 'https://m5.amap.com/ws/car-place/show?' + getQuery(node, adiu,channel, key, sign);
+        body = getShowBody(node, channel, adiu, userId, sign, actID, playID);
+        body = getBody(body,key);
+        headers = getHeaders(sessionid);
+        const rest = {url: url,body: body,headers: headers};
+        $.post(rest, (err, resp, data) => {
+            try {
+                debug("resp查询："+data)
+                var obj = JSON.parse(data);
+                if(obj?.code == '1'){
+                    obj?.data?.playMap?.dailySign?.signList.forEach(t => {
+                        if(t?.date == $.time('MM月dd日')){
+                            signTerm = obj?.data?.playMap?.dailySign?.signTerm;
+                            signDay = t.day;
+                            isSign = t.isSign;//isSign = 1 为签到过，懒得管了，让它再提交一次吧
+                            message += `查询:${t.date} isSign=${isSign} ${t.award.amount}里程\n`;
+                            return isOk = true;//查询结果
+                        }
+                    })
+                }else{
+                    message += `查询:${obj?.message}\n`;
+                    return isOk = false;//查询结果
+                }
+            } catch (e) {
+                $.logErr(e,"❌查询：请重新登陆更新Token");
+            } finally {
+                resove()
+            }
+        })
+    })
+}
+function signIn() {
+    return new Promise((resove) => {
+        key = getKey();
+        sign = getSign(channel);
+        url= 'https://m5.amap.com/ws/alice/activity/daily_sign/do_sign?' + getQuery(node, adiu,channel, key, sign);
+        body = getSigBody(node, channel, adiu, userId, sign, actID, playID, signTerm, signDay);
+        body = getBody(body,key);
+        headers = getHeaders(sessionid);
+        const rest = {url: url,body: body,headers: headers};
+        $.post(rest, (err, resp, data) => {
+            try {
+                debug('resp签到：'+data)
+                var obj = JSON.parse(data);
+                if(obj?.code == '1'){
+                    message += `签到:签到成功\n`;
+                }else{
+                    message += `签到:${obj?.message}\n`;
+                }
+            } catch (e) {
+                $.logErr(e,"❌请重新登陆更新Token");
+            } finally {
+                resove()
+            }
+        })
+    })
+}
 
 //通知
 async function SendMsg(message){$.isNode()?await notify.sendNotify($.name,message):$.msg($.name,"",message);}
