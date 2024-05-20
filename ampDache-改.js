@@ -49,7 +49,8 @@ var gdVals = ($.getdata(_key) || ($.isNode() ? process.env[_key] : '')).split('\
         let userId = account.userId;
         let sessionid = account.sessionid;
         let adiu = account.adiu;
-
+        let node = '', channel = '', actID = '', playID = '', isOk = false;
+        
         if (sessionid.length < 30) {
             $.msg($.name, '', `❌账号${i + 1}：请先获取sessionid🎉`);
             continue;
@@ -59,16 +60,25 @@ var gdVals = ($.getdata(_key) || ($.isNode() ? process.env[_key] : '')).split('\
         intCryptoJS();
 
         message += `----------账号${i + 1}：微信小程序签到----------\n`;
-        node = 'wechatMP', channel = 'h5_common', actID = '53A31cHhhPJ', playID = '53A3fQm9AM7';
-        await checkIn(); isOk && (await signIn());
+        node = 'wechatMP';
+        channel = 'h5_common';
+        actID = '53A31cHhhPJ';
+        playID = '53A3fQm9AM7';
+        await checkIn(userId, sessionid, adiu, node, channel, actID, playID, isOk);
 
         message += `----------账号${i + 1}：高德地图APP签到----------\n`;
-        node = 'Amap', channel = 'h5_common', actID = '53m5Q2UjZ6J', playID = '53m5Xt43PGU';
-        await checkIn(); isOk && (await signIn());
+        node = 'Amap';
+        channel = 'h5_common';
+        actID = '53m5Q2UjZ6J';
+        playID = '53m5Xt43PGU';
+        await checkIn(userId, sessionid, adiu, node, channel, actID, playID, isOk);
 
         message += `----------账号${i + 1}：支付宝小程序签到----------\n`;
-        node = 'alipayMini', channel = 'alipay_mini', actID = '53wHnt77TQ5', playID = '53wHtx24q7u';
-        await checkIn(); isOk && (await signIn());
+        node = 'alipayMini';
+        channel = 'alipay_mini';
+        actID = '53wHnt77TQ5';
+        playID = '53wHtx24q7u';
+        await checkIn(userId, sessionid, adiu, node, channel, actID, playID, isOk);
     }
 
     console.log(message); // 打印日志
@@ -81,17 +91,82 @@ var gdVals = ($.getdata(_key) || ($.isNode() ? process.env[_key] : '')).split('\
     $.done();
 });
 
+async function checkIn(userId, sessionid, adiu, node, channel, actID, playID, isOk) {
+    return new Promise((resolve) => {
+        let key = getKey();
+        let sign = getSign(channel);
+        let url = 'https://m5.amap.com/ws/car-place/show?' + getQuery(node, adiu, channel, key, sign);
+        let body = getShowBody(node, channel, adiu, userId, sign, actID, playID);
+        body = getBody(body, key);
+        let headers = getHeaders(sessionid);
+        const rest = {url: url, body: body, headers: headers};
+        
+        $.post(rest, (err, resp, data) => {
+            try {
+                debug("resp查询：" + data);
+                var obj = JSON.parse(data);
+                if (obj?.code == '1') {
+                    obj?.data?.playMap?.dailySign?.signList.forEach(t => {
+                        if (t?.date == $.time('MM月dd日')) {
+                            let signTerm = obj?.data?.playMap?.dailySign?.signTerm;
+                            let signDay = t.day;
+                            let isSign = t.isSign; // isSign = 1 为签到过，懒得管了，让它再提交一次吧
+                            message += `查询:${t.date} isSign=${isSign} ${t.award.amount}里程\n`;
+                            isOk = true; // 查询结果
+                        }
+                    });
+                } else {
+                    message += `查询:${obj?.message}\n`;
+                    isOk = false; // 查询结果
+                }
+            } catch (e) {
+                $.logErr(e, "❌查询：请重新登陆更新Token");
+            } finally {
+                resolve();
+            }
+        });
+    });
+}
+
+async function signIn(userId, sessionid, adiu, node, channel, actID, playID, signTerm, signDay) {
+    return new Promise((resolve) => {
+        let key = getKey();
+        let sign = getSign(channel);
+        let url = 'https://m5.amap.com/ws/alice/activity/daily_sign/do_sign?' + getQuery(node, adiu, channel, key, sign);
+        let body = getSigBody(node, channel, adiu, userId, sign, actID, playID, signTerm, signDay);
+        body = getBody(body, key);
+        let headers = getHeaders(sessionid);
+        const rest = {url: url, body: body, headers: headers};
+        
+        $.post(rest, (err, resp, data) => {
+            try {
+                debug('resp签到：' + data);
+                var obj = JSON.parse(data);
+                if (obj?.code == '1') {
+                    message += `签到:签到成功\n`;
+                } else {
+                    message += `签到:${obj?.message}\n`;
+                }
+            } catch (e) {
+                $.logErr(e, "❌请重新登陆更新Token");
+            } finally {
+                resolve();
+            }
+        });
+    });
+}
+
 function getToken() {
     if ($request && $request.method != 'OPTIONS' && /\/common\/(alipaymini|wxmini)\?_ENCRYPT=/.test($request.url)) {
         let ENCRYPT = $request.url.split("_ENCRYPT=")[1].split("&")[0];
         ENCRYPT = base64decode(ENCRYPT);
         let obj = {}, abc = {};
-        ENCRYPT.split('&').forEach(item => obj[item.split('=')[0]] = (item.split('=')[1]))
+        ENCRYPT.split('&').forEach(item => obj[item.split('=')[0]] = (item.split('=')[1]));
         abc.userId = obj.userId;
         abc.adiu = obj.deviceId;
         abc.sessionid = obj.sessionId;
         if (abc.sessionid.length > 30) {
-            $.setdata(JSON.stringify(abc), `${_key}_1`);
+            $.setdata(JSON.stringify(abc), _key);
             $.msg($.name, '从小程序获取签到sessionid成功🎉', $.toStr(abc));
         }
     } else if ($request && $request.method != 'OPTIONS') {
@@ -102,14 +177,14 @@ function getToken() {
         let hed = $request.headers;
         abc.sessionid = hed['Sessionid'] || hed['sessionid'];
         if (abc.sessionid.length > 30) {
-            $.setdata(JSON.stringify(abc), `${_key}_1`);
+            $.setdata(JSON.stringify(abc), _key);
             $.msg($.name, '获取签到sessionid成功🎉', $.toStr(abc));
         } else {
             let ck = hed['Cookie'] || hed['cookie'];
             if (ck.includes('sessionid=')) {
                 abc.sessionid = ck.split("sessionid=")[1].split(";")[0];
                 if (abc.sessionid.length > 30) {
-                    $.setdata(JSON.stringify(abc), `${_key}_1`);
+                    $.setdata(JSON.stringify(abc), _key);
                     $.msg($.name, '从Cookie中获取签到sessionid成功🎉', $.toStr(abc));
                 }
             }
