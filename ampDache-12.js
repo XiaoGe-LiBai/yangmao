@@ -37,13 +37,13 @@ function s(e,t){var n,r=4-e.length%4;n=t?0==(3&e.length)?e.length>>>2:1+(e.lengt
 const $ = new Env("高德地图签到");
 const _key = 'GD_Val';
 var gdVal = $.getdata(_key) || ($.isNode() ? process.env[_key] : '');
-$.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false';//false-true
+$.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false'; // false-true
 const notify = $.isNode() ? require('./sendNotify') : '';
 var message = '';
 
-var node='', channel='', adiu='', userId='', actID='', playID='', sessionid='',isOk=false;
+var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', sessionid = '', isOk = false;
 
-!(async() => {
+!(async () => {
     if (typeof $request != "undefined") {
         getToken();
         return;
@@ -54,39 +54,42 @@ var node='', channel='', adiu='', userId='', actID='', playID='', sessionid='',i
             let obj = JSON.parse(account);
             userId = obj.userId;
             sessionid = obj.sessionid;
-            adiu = obj.adiu; 
+            adiu = obj.adiu;
             if (sessionid.length < 30) {
                 $.msg($.name, '', '❌请先获取sessionid🎉');
                 return;
             }
             await checkInAndSign();
         }
-        // 发送通知
-        await SendMsg(message);
     } else {
         $.msg($.name, '', '❌请先获取sessionid🎉');
         return;
     }
 })()
-.catch((e) => {$.log("", `❌失败! 原因: ${e}!`, "");})
-.finally(() => {$.done();});
+    .catch((e) => { $.log("", `❌失败! 原因: ${e}!`, ""); })
+    .finally(() => { $.done(); });
 
 
 async function checkInAndSign() {
     intRSA();
     intCryptoJS();
 
-    message += `----------微信小程序签到----------\n`;
-    node = 'wechatMP',channel = 'h5_common',actID = '53A31cHhhPJ',playID = '53A3fQm9AM7';
-    await checkIn(); isOk && (await signIn());
+    message += `---------- 账号签到情况 ----------\n`;
 
-    message += `----------高德地图APP签到----------\n`;
-    node = 'Amap',channel = 'h5_common',actID = '53m5Q2UjZ6J',playID = '53m5Xt43PGU';
-    await checkIn(); isOk && (await signIn());
+    node = 'wechatMP', channel = 'h5_common', actID = '53A31cHhhPJ', playID = '53A3fQm9AM7';
+    await checkIn();
+    await signIn();
 
-    message += `----------支付宝小程序签到----------\n`;
-    node = 'alipayMini',channel = 'alipay_mini',actID = '53wHnt77TQ5',playID = '53wHtx24q7u';
-    await checkIn(); isOk && (await signIn());
+    node = 'Amap', channel = 'h5_common', actID = '53m5Q2UjZ6J', playID = '53m5Xt43PGU';
+    await checkIn();
+    await signIn();
+
+    node = 'alipayMini', channel = 'alipay_mini', actID = '53wHnt77TQ5', playID = '53wHtx24q7u';
+    await checkIn();
+    await signIn();
+
+    console.log(message); //node,青龙日志
+    await SendMsg(message);
 }
 
 function getToken() {
@@ -104,7 +107,7 @@ function getToken() {
         }
     } else if ($request && $request.method != 'OPTIONS') { //WX、ALI、APP
         let abc = {};
-		let obj = JSON.parse($response.body);
+        let obj = JSON.parse($response.body);
         abc.userId = obj.content.uid;
         abc.adiu = obj.content.adiu;
         let hed = $request.headers;
@@ -130,11 +133,13 @@ function getKey() {
         r += t.charAt(Math.floor(Math.random() * n));
     return r
 }
+
 function getSign(channel) {
     const sign = channel + '@oEEln6dQJK7lRfGxQjlyGthZ4loXcRHR'
     return md5(sign).toUpperCase()
 }
-function getQuery(node, adiu,channel, key, sign) {
+
+function getQuery(node, adiu, channel, key, sign) {
     let xck = RSA_Public_Encrypt(key);
     let _in = {
         "channel": channel,
@@ -152,10 +157,11 @@ function getQuery(node, adiu,channel, key, sign) {
     return Json2Form(query)
 }
 
-function getBody(body,key) {
+function getBody(body, key) {
     body = 'in=' + encodeURIComponent(Encrypt_Body(Json2Form(body), key));
     return body
 }
+
 function getHeaders(sessionid) {
     return {
         'Content-Type': 'application/x-www-form-urlencoded',
