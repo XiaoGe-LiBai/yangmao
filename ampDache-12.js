@@ -50,6 +50,7 @@ var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', se
     }
     if (gdVal != undefined) {
         let accounts = gdVal.split('\n');
+        let count = 1; // 添加计数器以跟踪账号数量
         for (let account of accounts) {
             let obj = JSON.parse(account);
             userId = obj.userId;
@@ -59,8 +60,9 @@ var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', se
                 $.msg($.name, '', '❌请先获取sessionid🎉');
                 return;
             }
-            await checkInAndSign();
+            await checkInAndSign(count); // 将计数器作为参数传递给函数
             message = ''; // 清空消息，以便下一个账号开始时不会包含之前的信息
+            count++; // 增加计数器
         }
     } else {
         $.msg($.name, '', '❌请先获取sessionid🎉');
@@ -71,11 +73,11 @@ var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', se
     .finally(() => { $.done(); });
 
 
-async function checkInAndSign() {
+async function checkInAndSign(count) { // 添加计数器作为参数
     intRSA();
     intCryptoJS();
 
-    message += `---------- 账号签到情况 ----------\n`;
+    message += `---------- 账号${count}签到情况 ----------\n`; // 在标题中添加计数器
 
     node = 'wechatMP', channel = 'h5_common', actID = '53A31cHhhPJ', playID = '53A3fQm9AM7';
     await checkIn();
@@ -170,6 +172,7 @@ function getHeaders(sessionid) {
         'sessionid': sessionid
     }
 }
+
 
 function getShowBody(node, channel,adiu, userId, sign, actID, playIDs) {
     return {
