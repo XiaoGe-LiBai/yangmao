@@ -39,7 +39,7 @@ const _key = 'GD_Val';
 var gdVal = $.getdata(_key) || ($.isNode() ? process.env[_key] : '');
 $.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false'; // false-true
 const notify = $.isNode() ? require('./sendNotify') : '';
-var message = '';
+var message = ''; // 存储所有的通知消息
 
 var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', sessionid = '', isOk = false;
 
@@ -61,9 +61,10 @@ var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', se
                 return;
             }
             await checkInAndSign(count); // 将计数器作为参数传递给函数
-            message = ''; // 清空消息，以便下一个账号开始时不会包含之前的信息
+            message += '\n'; // 添加一个换行，以便分隔不同账号的签到情况
             count++; // 增加计数器
         }
+        await SendMsg(message); // 在所有循环结束后一次性发送通知
     } else {
         $.msg($.name, '', '❌请先获取sessionid🎉');
         return;
@@ -92,7 +93,6 @@ async function checkInAndSign(count) { // 添加计数器作为参数
     await signIn();
 
     console.log(message); //node,青龙日志
-    await SendMsg(message);
 }
 
 function getToken() {
