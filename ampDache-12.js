@@ -39,7 +39,7 @@ const _key = 'GD_Val';
 var gdVal = $.getdata(_key) || ($.isNode() ? process.env[_key] : '');
 $.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false'; // false-true
 const notify = $.isNode() ? require('./sendNotify') : '';
-var message = ''; // 存储所有的通知消息
+var message = []; // 存储所有的通知消息
 
 var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', sessionid = '', isOk = false;
 
@@ -61,10 +61,9 @@ var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', se
                 return;
             }
             await checkInAndSign(count); // 将计数器作为参数传递给函数
-            message += '\n'; // 添加一个换行，以便分隔不同账号的签到情况
             count++; // 增加计数器
         }
-        await SendMsg(message); // 在所有循环结束后一次性发送通知
+        await SendMsg(message.join('\n')); // 在所有循环结束后一次性发送通知
     } else {
         $.msg($.name, '', '❌请先获取sessionid🎉');
         return;
@@ -78,7 +77,7 @@ async function checkInAndSign(count) { // 添加计数器作为参数
     intRSA();
     intCryptoJS();
 
-    message += `---------- 账号${count}签到情况 ----------\n`; // 在标题中添加计数器
+    message.push(`---------- 账号${count}签到情况 ----------`); // 在标题中添加计数器
 
     node = 'wechatMP', channel = 'h5_common', actID = '53A31cHhhPJ', playID = '53A3fQm9AM7';
     await checkIn();
