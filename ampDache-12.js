@@ -35,8 +35,8 @@ function s(e,t){var n,r=4-e.length%4;n=t?0==(3&e.length)?e.length>>>2:1+(e.lengt
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 const $ = new Env("高德地图签到");
-const _key = 'GD_Val';
-vvar gdVal = $.getdata(_key) || ($.isNode() ? process.env[_key] : '');
+const _key = 'GD_Val1';
+var gdVal = $.getdata(_key) || ($.isNode() ? process.env[_key] : '');
 $.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false'; // false-true
 const notify = $.isNode() ? require('./sendNotify') : '';
 var message = '';
