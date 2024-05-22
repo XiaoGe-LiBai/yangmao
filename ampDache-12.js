@@ -60,6 +60,7 @@ var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', se
                 return;
             }
             await checkInAndSign();
+            message = ''; // 清空消息，以便下一个账号开始时不会包含之前的信息
         }
     } else {
         $.msg($.name, '', '❌请先获取sessionid🎉');
