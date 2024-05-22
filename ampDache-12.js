@@ -41,8 +41,6 @@ $.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'fal
 const notify = $.isNode() ? require('./sendNotify') : '';
 var message = []; // 存储所有的通知消息
 
-var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', sessionid = '', isOk = false;
-
 !(async () => {
     if (typeof $request != "undefined") {
         getToken();
@@ -133,7 +131,7 @@ function getToken() {
 function getKey() {
     for (var t = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678', n = t.length, r = "", i = 0; i < 16; i++)
         r += t.charAt(Math.floor(Math.random() * n));
-    return r
+    return 
 }
 
 function getSign(channel) {
