@@ -37,58 +37,53 @@ function s(e,t){var n,r=4-e.length%4;n=t?0==(3&e.length)?e.length>>>2:1+(e.lengt
 const $ = new Env("高德地图签到");
 const _key = 'GD_Val';
 var gdVal = $.getdata(_key) || ($.isNode() ? process.env[_key] : '');
-$.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false'; // false-true
+$.is_debug = ($.isNode() ? process.env.IS_DEDUG : $.getdata('is_debug')) || 'false';//false-true
 const notify = $.isNode() ? require('./sendNotify') : '';
-var message = []; // 存储所有的通知消息
+var messageArray = [];
 
-!(async () => {
+!(async() => {
     if (typeof $request != "undefined") {
         getToken();
         return;
     }
     if (gdVal != undefined) {
         let accounts = gdVal.split('\n');
-        let count = 1; // 添加计数器以跟踪账号数量
         for (let account of accounts) {
             let obj = JSON.parse(account);
             userId = obj.userId;
             sessionid = obj.sessionid;
-            adiu = obj.adiu;
+            adiu = obj.adiu; 
             if (sessionid.length < 30) {
-                $.msg($.name, '', '❌请先获取sessionid🎉');
-                return;
+                messageArray.push(`❌账号${userId}：请先获取sessionid🎉`);
+                continue;
             }
-            await checkInAndSign(count); // 将计数器作为参数传递给函数
-            count++; // 增加计数器
+            await checkInAndSign();
         }
-        await SendMsg(message.join('\n')); // 在所有循环结束后一次性发送通知
     } else {
-        $.msg($.name, '', '❌请先获取sessionid🎉');
-        return;
+        messageArray.push(`❌请先获取sessionid🎉`);
     }
 })()
-    .catch((e) => { $.log("", `❌失败! 原因: ${e}!`, ""); })
-    .finally(() => { $.done(); });
+.catch((e) => {$.log("", `❌失败! 原因: ${e}!`, "");})
+.finally(() => {SendMsg(messageArray.join("\n")); $.done();});
 
 
-async function checkInAndSign(count) { // 添加计数器作为参数
+async function checkInAndSign() {
     intRSA();
     intCryptoJS();
 
-    message.push(`---------- 账号${count}签到情况 ----------`); // 在标题中添加计数器
+    let message = `----------账号${userId}签到情况----------\n`;
+    node = 'wechatMP',channel = 'h5_common',actID = '53A31cHhhPJ',playID = '53A3fQm9AM7';
+    await checkIn(message); isOk && (await signIn(message));
 
-    node = 'wechatMP', channel = 'h5_common', actID = '53A31cHhhPJ', playID = '53A3fQm9AM7';
-    await checkIn();
-    await signIn();
+    message += `----------账号${userId}签到情况----------\n`;
+    node = 'Amap',channel = 'h5_common',actID = '53m5Q2UjZ6J',playID = '53m5Xt43PGU';
+    await checkIn(message); isOk && (await signIn(message));
 
-    node = 'Amap', channel = 'h5_common', actID = '53m5Q2UjZ6J', playID = '53m5Xt43PGU';
-    await checkIn();
-    await signIn();
+    message += `----------账号${userId}签到情况----------\n`;
+    node = 'alipayMini',channel = 'alipay_mini',actID = '53wHnt77TQ5',playID = '53wHtx24q7u';
+    await checkIn(message); isOk && (await signIn(message));
 
-    node = 'alipayMini', channel = 'alipay_mini', actID = '53wHnt77TQ5', playID = '53wHtx24q7u';
-    await checkIn();
-    await signIn();
-
+    messageArray.push(message);
     console.log(message); //node,青龙日志
 }
 
@@ -103,25 +98,25 @@ function getToken() {
         abc.sessionid = obj.sessionId;
         if (abc.sessionid.length > 30) {
             $.setdata(JSON.stringify(abc), _key);
-            $.msg($.name, '从小程序获取签到sessionid成功🎉', $.toStr(abc));
+            messageArray.push(`从小程序获取签到sessionid成功🎉: ${JSON.stringify(abc)}`);
         }
     } else if ($request && $request.method != 'OPTIONS') { //WX、ALI、APP
         let abc = {};
-        let obj = JSON.parse($response.body);
+		let obj = JSON.parse($response.body);
         abc.userId = obj.content.uid;
         abc.adiu = obj.content.adiu;
         let hed = $request.headers;
         abc.sessionid = hed['Sessionid'] || hed['sessionid'];
         if (abc.sessionid.length > 30) {
             $.setdata(JSON.stringify(abc), _key);
-            $.msg($.name, '获取签到sessionid成功🎉', $.toStr(abc));
+            messageArray.push(`获取签到sessionid成功🎉: ${JSON.stringify(abc)}`);
         } else {
             let ck = hed['Cookie'] || hed['cookie'];
             if (ck.includes('sessionid=')) {
                 abc.sessionid = ck.split("sessionid=")[1].split(";")[0];
                 if (abc.sessionid.length > 30) {
                     $.setdata(JSON.stringify(abc), _key);
-                    $.msg($.name, '从Cookie中获取签到sessionid成功🎉', $.toStr(abc));
+                    messageArray.push(`从Cookie中获取签到sessionid成功🎉: ${JSON.stringify(abc)}`);
                 }
             }
         }
@@ -131,7 +126,7 @@ function getToken() {
 function getKey() {
     for (var t = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678', n = t.length, r = "", i = 0; i < 16; i++)
         r += t.charAt(Math.floor(Math.random() * n));
-    return 
+    return r
 }
 
 function getSign(channel) {
