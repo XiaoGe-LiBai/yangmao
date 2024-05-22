@@ -61,6 +61,8 @@ var node='', channel='', adiu='', userId='', actID='', playID='', sessionid='',i
             }
             await checkInAndSign();
         }
+        // 发送通知
+        await SendMsg(message);
     } else {
         $.msg($.name, '', '❌请先获取sessionid🎉');
         return;
@@ -85,9 +87,6 @@ async function checkInAndSign() {
     message += `----------支付宝小程序签到----------\n`;
     node = 'alipayMini',channel = 'alipay_mini',actID = '53wHnt77TQ5',playID = '53wHtx24q7u';
     await checkIn(); isOk && (await signIn());
-
-    console.log(message); //node,青龙日志
-    await SendMsg(message);
 }
 
 function getToken() {
