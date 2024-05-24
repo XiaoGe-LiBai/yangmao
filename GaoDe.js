@@ -49,7 +49,7 @@ var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', se
         return;
     }
     if (gdVal != undefined) {
-        let accounts = gdVal.split('\n');
+        let accounts = gdVal.split('&');
         let count = 1; // 添加计数器以跟踪账号数量
         for (let account of accounts) {
             let obj = JSON.parse(account);
