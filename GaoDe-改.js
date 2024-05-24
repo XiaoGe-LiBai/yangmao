@@ -54,7 +54,13 @@ var node = '', channel = '', adiu = '', userId = '', actID = '', playID = '', se
         for (let account of accounts) {
             try {
                 console.log("Parsing account:", account); // 打印调试信息
-                let obj = JSON.parse(account);
+                // 对每个 account 进行预处理，去除多余的空格和字符
+                account = account.trim();
+                // 确保 account 是一个有效的 JSON 字符串
+                if (account[account.length - 1] !== '}') {
+                    account += '"}';
+                }
+                let obj = JSON.parse(account); // 确保每个 account 都被正确解析
                 userId = obj.userId;
                 sessionid = obj.sessionid;
                 adiu = obj.adiu;
@@ -137,6 +143,7 @@ function getToken() {
         }
     }
 }
+
 
 function getKey() {
     for (var t = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678', n = t.length, r = "", i = 0; i < 16; i++)
