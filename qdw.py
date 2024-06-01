@@ -49,3 +49,35 @@ else:
         if response['code']==0:
             print(f"账号【{str(sid)[:18]}】 连续签到【{re['data']['continuesDay']}天】\n当前可用积分:{response['data']['member']['stats']['points']}")
 
+if __name__ == '__main__':
+    # 加载通知
+    load_send()
+
+    # 抢购
+    maotai_configs = get_envs(env_key)
+    msg = ''
+    index = 1
+    for config in maotai_configs.split("&"):
+        single_msg = f'===== 第{index}个账号 =====\n'
+        if not config:
+            continue
+        province, city, lng, lat, device_id, token, ck = config.split(',')
+        time_keys = str(int(time.mktime(datetime.date.today().timetuple())) * 1000)
+        try:
+            get_map()
+            session_id, item_codes = get_session_id(device_id, token)
+            user_name, user_id, mobile = get_user_id(token, device_id)
+            for item_code in item_codes:
+                name = res_map.get(str(item_code))
+                shop_id = get_shop_item(session_id, item_code, device_id, token, province, city)
+                res = mt_add(item_code, str(shop_id), session_id, user_id, token, device_id)
+                single_msg += f'{user_name}({mobile}) {name} 签到结果: {res}\n'
+            r = getUserEnergyAward(device_id, ck)
+            single_msg += f'{user_name}({mobile} 耐力: {r}\n'
+        except Exception as e:
+            single_msg += f'异常: {e}'
+        logging.info(single_msg)
+        msg += single_msg + '\n\n'
+        index += 1
+
+        send('七点五饮用天然矿泉水_小程序_签到结果', msg)
