@@ -7,7 +7,6 @@ import json
 import execjs
 import base64
 import random
-import certifi
 import aiohttp
 import asyncio
 import certifi
