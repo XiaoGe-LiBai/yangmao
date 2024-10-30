@@ -442,10 +442,10 @@ def main():
     else:
         print("瑞数加密已关闭")
         rs = 0     
-    if os.environ.get('hf2')!= None:
-        chinaTelecomAccount = os.environ.get('jdhf')
+    if os.environ.get('hf4')!= None:
+        chinaTelecomAccount = os.environ.get('hf4')
     else:
-       chinaTelecomAccount = jdhf
+       chinaTelecomAccount = hf4
     
     for i in chinaTelecomAccount.split('&'):
 
