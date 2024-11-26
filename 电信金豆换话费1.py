@@ -402,7 +402,8 @@ def ks(phone, ticket, uid):
 
 def first_request(res=''):
     global js, fw
-    url = 'https://wapact.189.cn:9001/gateway/stand/detail/exchange'
+    # url = 'https://wapact.189.cn:9001/gateway/stand/detail/exchange'
+    url = 'https://wapact.189.cn:9001/gateway/standExchange/detailNew/exchange'
     if res == '':
         response = ss.get(url)
         res =  response.text
