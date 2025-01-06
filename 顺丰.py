@@ -1711,7 +1711,7 @@ if __name__ == '__main__':
     local_version = '2025.01.04'
     token = os.getenv(ENV_NAME)
     # 将分隔符从\n改为&
-    tokens = token.split('&')
+    tokens = token.split('\n')
     # print(tokens)
     if len(tokens) > 0:
         print(f">>>>>>>>>>共获取到{len(tokens)}个账号<<<<<<<<<<")
