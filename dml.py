@@ -3,12 +3,12 @@ import requests
 
 message = ''
 # 本地测试用环境变量设置
-os.environ['dmlck'] = ''
+os.environ['dmlCookie'] = ''
 
-if not os.environ.get('dmlck'):
+if not os.environ.get('dmlCookie'):
     print('叼毛CK都没跑个毛啊？')
 else:
-    accounts_list = os.environ.get('dmlck').split('&')
+    accounts_list = os.environ.get('dmlCookie').split('&')
 
     num_of_accounts = len(accounts_list)
     print(f"获取到 {num_of_accounts} 个账号")
