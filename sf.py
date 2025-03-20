@@ -1,13 +1,5 @@
-#2025/1/24 遍历生活特权所有分组的券进行领券，券没啥用但完成可领取30点丰蜜目前一天拉满155点。去除失效活动，支持蜜罐自动扩容
-#变量名：sfsyUrl
-#格式：多账号用&分割或创建多个变量sfsyUrl
-#关于参数获取如下两种方式：
-#❶顺丰APP绑定微信后，前往该站点sm.linzixuan.work用微信扫码登录后，选择复制编码Token，不要复制错
-#或者
-#❷打开小程序或APP-我的-积分, 手动抓包以下几种URL之一
-#https://mcs-mimp-web.sf-express.com/mcs-mimp/share/weChat/shareGiftReceiveRedirect
-#https://mcs-mimp-web.sf-express.com/mcs-mimp/share/app/shareRedirect
-#抓好URL后访问https://www.toolhelper.cn/EncodeDecode/Url进行编码，请务必按提示操作
+#多号换行，变量名：sfsyUrl
+# const $ = new Env('顺丰速运')
 import hashlib
 import json
 import os
@@ -17,7 +9,6 @@ from datetime import datetime, timedelta
 from sys import exit
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from urllib.parse import unquote
 
 # 禁用安全请求警告
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -43,7 +34,7 @@ def Log(cont=''):
         send_msg += f'{cont}\n'
 
 
-inviteId = ['']
+inviteId = ['A959FF988C64448198CDEB08FC84844F','0A5BCEB5EA454B878C34EB01A33AF080']
 
 
 class RUN:
@@ -58,7 +49,7 @@ class RUN:
         if len_split_info > 0 and "UID_" in last_info:
             self.send_UID = last_info
         self.index = index + 1
-        print(f"\n{'='*20} 🔄 开始执行第{self.index}个账号 🔄 {'='*20}")
+        Log(f"\n---------开始执行第{self.index}个账号>>>>>")
         self.s = requests.session()
         self.s.verify = False
         self.headers = {
@@ -95,22 +86,17 @@ class RUN:
                 result += char
         return result
 
-    def login(self, sfurl):
-        try:
-            decoded_url = unquote(sfurl)
-            ress = self.s.get(decoded_url, headers=self.headers)
-            self.user_id = self.s.cookies.get_dict().get('_login_user_id_', '')
-            self.phone = self.s.cookies.get_dict().get('_login_mobile_', '')
-            self.mobile = self.phone[:3] + "*" * 4 + self.phone[7:] if self.phone else ''
-            
-            if self.phone:
-                Log(f'👤 用户:【{self.mobile}】登陆成功')
-                return True
-            else:
-                Log(f'❌ 获取用户信息失败')
-                return False
-        except Exception as e:
-            Log(f'❌ 登录异常: {str(e)}')
+    def login(self, sfsyUrl):
+        ress = self.s.get(sfsyUrl, headers=self.headers)
+        # print(ress.text)
+        self.user_id = self.s.cookies.get_dict().get('_login_user_id_', '')
+        self.phone = self.s.cookies.get_dict().get('_login_mobile_', '')
+        self.mobile = self.phone[:3] + "*" * 4 + self.phone[7:]
+        if self.phone != '':
+            Log(f'用户:【{self.mobile}】登陆成功')
+            return True
+        else:
+            Log(f'获取用户信息失败')
             return False
 
     def getSign(self):
@@ -146,27 +132,29 @@ class RUN:
             return None
 
     def sign(self):
-        print(f'🎯 开始执行签到')
+        print(f'>>>>>>开始执行签到')
         json_data = {"comeFrom": "vioin", "channelFrom": "WEIXIN"}
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~integralTaskSignPlusService~automaticSignFetchPackage'
         response = self.do_request(url, data=json_data)
+        # print(response)
         if response.get('success') == True:
             count_day = response.get('obj', {}).get('countDay', 0)
             if response.get('obj') and response['obj'].get('integralTaskSignPackageVOList'):
                 packet_name = response["obj"]["integralTaskSignPackageVOList"][0]["packetName"]
-                Log(f'✨ 签到成功，获得【{packet_name}】，本周累计签到【{count_day + 1}】天')
+                Log(f'>>>签到成功，获得【{packet_name}】，本周累计签到【{count_day + 1}】天')
             else:
-                Log(f'📝 今日已签到，本周累计签到【{count_day + 1}】天')
+                Log(f'今日已签到，本周累计签到【{count_day + 1}】天')
         else:
-            print(f'❌ 签到失败！原因：{response.get("errorMessage")}')
+            print(f'签到失败！原因：{response.get("errorMessage")}')
 
     def superWelfare_receiveRedPacket(self):
-        print(f'🎁 超值福利签到')
+        print(f'>>>>>>超值福利签到')
         json_data = {
             'channel': 'czflqdlhbxcx'
         }
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberActLengthy~redPacketActivityService~superWelfare~receiveRedPacket'
         response = self.do_request(url, data=json_data)
+        # print(response)
         if response.get('success') == True:
             gift_list = response.get('obj', {}).get('giftList', [])
             if response.get('obj', {}).get('extraGiftList', []):
@@ -174,25 +162,26 @@ class RUN:
             gift_names = ', '.join([gift['giftName'] for gift in gift_list])
             receive_status = response.get('obj', {}).get('receiveStatus')
             status_message = '领取成功' if receive_status == 1 else '已领取过'
-            Log(f'🎉 超值福利签到[{status_message}]: {gift_names}')
+            Log(f'超值福利签到[{status_message}]: {gift_names}')
         else:
             error_message = response.get('errorMessage') or json.dumps(response) or '无返回'
-            print(f'❌ 超值福利签到失败: {error_message}')
+            print(f'超值福利签到失败: {error_message}')
 
     def get_SignTaskList(self, END=False):
-        if not END: print(f'🎯 开始获取签到任务列表')
+        if not END: print(f'>>>开始获取签到任务列表')
         json_data = {
             'channelType': '1',
             'deviceId': self.get_deviceId(),
         }
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~integralTaskStrategyService~queryPointTaskAndSignFromES'
         response = self.do_request(url, data=json_data)
+        # print(response)
         if response.get('success') == True and response.get('obj') != []:
             totalPoint = response["obj"]["totalPoint"]
             if END:
-                Log(f'💰 当前积分：【{totalPoint}】')
+                Log(f'当前积分：【{totalPoint}】')
                 return
-            Log(f'💰 执行前积分：【{totalPoint}】')
+            Log(f'执行前积分：【{totalPoint}】')
             for task in response["obj"]["taskTitleLevels"]:
                 self.taskId = task["taskId"]
                 self.taskCode = task["taskCode"]
@@ -201,10 +190,10 @@ class RUN:
                 status = task["status"]
                 skip_title = ['用行业模板寄件下单', '去新增一个收件偏好', '参与积分活动']
                 if status == 3:
-                    print(f'✨ {self.title}-已完成')
+                    print(f'>{self.title}-已完成')
                     continue
                 if self.title in skip_title:
-                    print(f'⏭️ {self.title}-跳过')
+                    print(f'>{self.title}-跳过')
                     continue
                 else:
                     # print("taskId:", taskId)
@@ -215,19 +204,19 @@ class RUN:
                 self.receiveTask()
 
     def doTask(self):
-        print(f'🎯 开始去完成【{self.title}】任务')
+        print(f'>>>开始去完成【{self.title}】任务')
         json_data = {
             'taskCode': self.taskCode,
         }
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonRoutePost/memberEs/taskRecord/finishTask'
         response = self.do_request(url, data=json_data)
         if response.get('success') == True:
-            print(f'✨ 【{self.title}】任务-已完成')
+            print(f'>【{self.title}】任务-已完成')
         else:
-            print(f'❌ 【{self.title}】任务-{response.get("errorMessage")}')
+            print(f'>【{self.title}】任务-{response.get("errorMessage")}')
 
     def receiveTask(self):
-        print(f'🎁 开始领取【{self.title}】任务奖励')
+        print(f'>>>开始领取【{self.title}】任务奖励')
         json_data = {
             "strategyId": self.strategyId,
             "taskId": self.taskId,
@@ -237,9 +226,9 @@ class RUN:
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~integralTaskStrategyService~fetchIntegral'
         response = self.do_request(url, data=json_data)
         if response.get('success') == True:
-            print(f'✨ 【{self.title}】任务奖励领取成功！')
+            print(f'>【{self.title}】任务奖励领取成功！')
         else:
-            print(f'❌ 【{self.title}】任务-{response.get("errorMessage")}')
+            print(f'>【{self.title}】任务-{response.get("errorMessage")}')
 
     def do_honeyTask(self):
         # 做任务
@@ -268,67 +257,52 @@ class RUN:
         else:
             print(f'收取任务【{self.taskType}】失败！原因：{response.get("errorMessage")}')
 
+    def get_coupom(self):
+        print('>>>执行领取生活权益领券任务')
+        # 领取生活权益领券
+        # https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberGoods~pointMallService~createOrder
 
-    def get_coupom(self, goods):  
-        # 请求参数
         json_data = {
             "from": "Point_Mall",
             "orderSource": "POINT_MALL_EXCHANGE",
-            "goodsNo": goods['goodsNo'],
+            "goodsNo": self.goodsNo,
             "quantity": 1,
             "taskCode": self.taskCode
         }
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberGoods~pointMallService~createOrder'
-    
-        # 发起领券请求
         response = self.do_request(url, data=json_data)
         if response.get('success') == True:
-           # print(f'> 领券成功！')
-            return True  # 领取成功
+            print(f'>领券成功！')
         else:
-           # print(f'> 领券失败！原因：{response.get("errorMessage")}')
-            return False  # 领取失败
-    
-    
-    def get_coupom_list(self):        
-        # 请求参数
+            print(f'>领券失败！原因：{response.get("errorMessage")}')
+
+    def get_coupom_list(self):
+        print('>>>获取生活权益券列表')
+        # 领取生活权益领券
+        # https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberGoods~pointMallService~createOrder
+
         json_data = {
             "memGrade": 2,
             "categoryCode": "SHTQ",
             "showCode": "SHTQWNTJ"
         }
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberGoods~mallGoodsLifeService~list'
-    
-        # 发起获取券列表请求
         response = self.do_request(url, data=json_data)
-    
+        # print(response)
         if response.get('success') == True:
-            # 遍历所有分组的券列表
-            all_goods = []
-            for obj in response.get("obj", []):  # 遍历所有券分组
-                goods_list = obj.get("goodsList", [])
-                all_goods.extend(goods_list)  # 收集到一个总列表中
-               
-            # 尝试领取
-            for goods in all_goods:
-                exchange_times_limit = goods.get('exchangeTimesLimit', 0)
-    
-                # 检查券是否可兑换
-                if exchange_times_limit >= 1:
-                    #print(f'尝试领取：{goods["goodsName"]}')
-                    
-                    # 尝试领取券
-                    if self.get_coupom(goods):
-                        print('✨ 成功领取券，任务结束！')
-                        return  # 成功领取后退出
-            print('📝 所有券尝试完成，没有可用的券或全部领取失败。')
+            goodsList = response["obj"][0]["goodsList"]
+            for goods in goodsList:
+                exchangeTimesLimit = goods['exchangeTimesLimit']
+                if exchangeTimesLimit >= 1:
+                    self.goodsNo = goods['goodsNo']
+                    print(f'当前选择券号：{self.goodsNo}')
+                    self.get_coupom()
+                    break
         else:
-            print(f'> 获取券列表失败！原因：{response.get("errorMessage")}')
-
-
+            print(f'>领券失败！原因：{response.get("errorMessage")}')
 
     def get_honeyTaskListStart(self):
-        print('🍯 开始获取采蜜换大礼任务列表')
+        print('>>>开始获取采蜜换大礼任务列表')
         # 任务列表
         json_data = {}
         self.headers['channel'] = 'wxwdsj'
@@ -341,7 +315,9 @@ class RUN:
                 self.taskType = item["taskType"]
                 status = item["status"]
                 if status == 3:
-                    print(f'✨ 【{self.taskType}】-已完成')
+                    print(f'>【{self.taskType}】-已完成')
+                    if self.taskType == 'BEES_GAME_TASK_TYPE':
+                        self.bee_need_help = False
                     continue
                 if "taskCode" in item:
                     self.taskCode = item["taskCode"]
@@ -395,7 +371,7 @@ class RUN:
             print(f'>扩容失败！【{response.get("errorMessage")}】')
 
     def honey_indexData(self, END=False):
-        if not END: print('\n🍯 开始执行采蜜换大礼任务')
+        if not END: print('\n>>>>>>>开始执行采蜜换大礼任务')
         # 邀请
         random_invite = random.choice([invite for invite in inviteId if invite != self.user_id])
         self.headers['channel'] = 'wxwdsj'
@@ -405,18 +381,18 @@ class RUN:
         if response.get('success') == True:
             usableHoney = response.get('obj').get('usableHoney')
             if END:
-                Log(f'🍯 当前丰蜜：【{usableHoney}】')
+                Log(f'当前丰蜜：【{usableHoney}】')
                 return
-            Log(f'🍯 执行前丰蜜：【{usableHoney}】')
+            Log(f'执行前丰蜜：【{usableHoney}】')
             taskDetail = response.get('obj').get('taskDetail')
             activityEndTime = response.get('obj').get('activityEndTime', '')
             activity_end_time = datetime.strptime(activityEndTime, "%Y-%m-%d %H:%M:%S")
             current_time = datetime.now()
 
             if current_time.date() == activity_end_time.date():
-                Log("⚠️ 本期活动今日结束，请及时兑换")
+                Log("本期活动今日结束，请及时兑换")
             else:
-                print(f'📅 本期活动结束时间【{activityEndTime}】')
+                print(f'本期活动结束时间【{activityEndTime}】')
 
             if taskDetail != []:
                 for task in taskDetail:
@@ -425,29 +401,33 @@ class RUN:
                     time.sleep(2)
 
     def EAR_END_2023_TaskList(self):
-        print('\n🎭 开始年终集卡任务')
+        print('\n>>>>>>开始32周年庆任务')
         # 任务列表
         json_data = {
-            "activityCode": "YEAREND_2024",
+            "activityCode": "ANNIVERSARY_2025",
             "channelType": "MINI_PROGRAM"
         }
-        self.headers['channel'] = '24nzdb'
+        self.headers['channel'] = '32annixcx'
         self.headers['platform'] = 'MINI_PROGRAM'
         self.headers['syscode'] = 'MCS-MIMP-CORE'
 
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~activityTaskService~taskList'
 
         response = self.do_request(url, data=json_data)
+        # print(response)
         if response.get('success') == True:
             for item in response["obj"]:
                 self.title = item["taskName"]
                 self.taskType = item["taskType"]
                 status = item["status"]
                 if status == 3:
-                    print(f'✨ 【{self.taskType}】-已完成')
+                    print(f'>【{self.taskType}】-已完成')
                     continue
                 if self.taskType == 'INTEGRAL_EXCHANGE':
                     self.EAR_END_2023_ExchangeCard()
+                elif self.taskType == 'PLAY_ACTIVITY_GAME':
+                    self.DRAGONBOAT_2024_index()
+                    self.DRAGONBOAT_2024_Game_init()
                 elif self.taskType == 'CLICK_MY_SETTING':
                     self.taskCode = item["taskCode"]
                     self.addDeliverPrefer()
@@ -457,7 +437,11 @@ class RUN:
                     time.sleep(3)
                     self.EAR_END_2023_receiveTask()
                 else:
-                    print(f'⚠️ 暂时不支持【{self.title}】任务')
+                    print(f'暂时不支持【{self.title}】任务')
+                # if self.taskType == 'BEES_GAME_TASK_TYPE':
+                #     self.honey_damaoxian()
+        self.EAR_END_2023_getAward()
+        #self.EAR_END_2023_GuessIdiom()
 
     def addDeliverPrefer(self):
         print(f'>>>开始【{self.title}】任务')
@@ -502,26 +486,99 @@ class RUN:
             print(f'>【{self.title}】任务-{response.get("errorMessage")}')
 
     def EAR_END_2023_ExchangeCard(self):
-        print(f'>>>开始积分兑换年卡')
+        print(f'>>>开始积分兑换找财神')
         json_data = {
-            "exchangeNum": 2,
-            "activityCode": "YEAREND_2024",
-            "channelType": "MINI_PROGRAM"
+            "activityCode": "ANNIVERSARY_2025",
+            "exchangeNum": 1
         }
-        url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonNoLoginPost/~memberNonactivity~yearEnd2024TaskService~integralExchange'
+        url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~anniversary2025FiftyPercentService~getPopInfo'
         response = self.do_request(url, data=json_data)
         if response.get('success') == True:
-            receivedAccountList = response['obj']['receivedAccountList']
-            for card in receivedAccountList:
-                print(f'>获得：【{card["urrency"]}】卡【{card["amount"]}】张！')
+            print(f'>【{self.title}】任务-已完成')
+
+    def EAR_END_2023_getAward(self):
+        print(f'>>>开始抽卡')
+        url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~anniversary2025ClaimService~claim'
+        for l in range(10):
+            for i in range(0, 3):
+                json_data = {
+                    "cardType": i
+                }
+                response = self.do_request(url, data=json_data)
+                # print(response)
+                if response.get('success') == True:
+                    receivedAccountList = response['obj']['receivedAccountList']
+                    for card in receivedAccountList:
+                        print(f'>获得：【{card["currency"]}】卡【{card["amount"]}】张！')
+                elif response.get('errorMessage') == '用户账户余额不足':
+                    break
+                elif response.get('errorMessage') == '用户信息失效，请退出重新进入':
+                    break
+                else:
+                    print(f'>抽卡失败：{response.get("errorMessage")}')
+                    break
+                time.sleep(3)
+
+    # def EAR_END_2023_GuessIdiom(self):
+        # print(f'>>>开始猜成语')
+        # url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024GuessIdiomService~win'
+        # for i in range(1, 11):
+            # json_data = {
+                # "index": i
+            # }
+            # response = self.do_request(url, data=json_data)
+            # if response.get('success') == True:
+                # print(f'第{i}关成功！')
+                # receivedAccountList = response['obj']['receivedAccountList']
+                # for card in receivedAccountList:
+                #     print(f'>获得：【{card["urrency"]}】卡【{card["amount"]}】张！')
+            # else:
+                # print(f'第{i}关失败！')
+
+    #查询新年回馈卡片数量
+    def EAR_END_2023_query(self):
+        print(f'>>>开始查询卡片数量')
+        url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~anniversary2025ClaimService~claimStatus'
+        response = self.do_request(url, {})
+        if response.get('success'):
+            obj = response.get('obj', None)
+            if obj == None: return False
+            currentAccountList = obj.get('currentAccountList', [])
+            if not currentAccountList:
+                print("当前没有卡片")
+            else:
+                print("当前卡片数量：")
+                for card in currentAccountList:
+                    currency = card.get('currency')
+                    totalAmount = card.get('totalAmount')
+                    balance = card.get('balance')
+                    if currency == 'DAI_BI':
+                        currency_name = '坐以待币'
+                    elif currency == 'CHENG_GONG':
+                        currency_name = '成功人士'
+                    elif currency == 'GAN_FAN':
+                        currency_name = '干饭圣体'
+                    elif currency == 'DING_ZHU':
+                        currency_name = '都顶得住'
+                    elif currency == 'ZHI_SHUI':
+                        currency_name = '心如止水'
+                    else:
+                        currency_name = currency
+                    print(f"卡片名称：{currency_name},数量：{balance}")
+
+            totalFortuneTimes = obj.get('totalFortuneTimes', 0)
+            print(f"总卡片数量：{totalFortuneTimes}")
+
+            return True
         else:
-            print(f'>【{self.title}】任务-{response.get("errorMessage")}')
+            print(f"查询失败：{response.get('errorMessage')}")
+            return False
 
     def EAR_END_2023_receiveTask(self):
         print(f'>>>开始领取【{self.title}】任务奖励')
         json_data = {
             "taskType": self.taskType,
-            "activityCode": "YEAREND_2024",
+            "activityCode": "ANNIVERSARY_2025",
             "channelType": "MINI_PROGRAM"
         }
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonNoLoginPost/~memberNonactivity~yearEnd2024TaskService~fetchMixTaskReward'
@@ -763,7 +820,7 @@ class RUN:
                             break
             else:
                 error_message = response['errorMessage'] or json.dumps(response) or '无返回'
-                print(f'📝 查询话题PK赛记录失败： {error_message}')
+                print(f'查询话题PK赛记录失败： {error_message}')
         except Exception as e:
             print(e)
 
@@ -773,7 +830,7 @@ class RUN:
         try:
             if not response or not response.get('success'):
                 error_message = response['errorMessage'] or json.dumps(response) or '无返回'
-                print(f'📝 查询账户状态失败： {error_message}')
+                print(f'查询账户状态失败： {error_message}')
         except Exception as e:
             print(e)
 
@@ -791,12 +848,12 @@ class RUN:
             currency_dto_list = result.get('obj', {}).get('currencyDTOList', [])
             if currency_dto_list:
                 rewards = [f"[{currency['currency']}]{currency['amount']}次" for currency in currency_dto_list]
-                print(f'🎭 话题PK赛第{index}个话题选择成功: {", ".join(rewards)}')
+                print(f'话题PK赛第{index}个话题选择成功: {", ".join(rewards)}')
             else:
-                print(f'🎭 话题PK赛第{index}个话题选择成功')
+                print(f'话题PK赛第{index}个话题选择成功')
         else:
             error_message = result.get('errorMessage') if result else '无返回'
-            print(f'📝 话题PK赛第{index}个话题失败: {error_message}')
+            print(f'话题PK赛第{index}个话题失败: {error_message}')
             if error_message and '系统繁忙' in error_message:
                 success = False
 
@@ -813,15 +870,15 @@ class RUN:
             today_titles = [title for title in guess_title_info_list if title['gameDate'] == self.today]
             for title_info in today_titles:
                 if title_info['answerStatus']:
-                    print('📝 今日已回答过竞猜')
+                    print('今日已回答过竞猜')
                 else:
                     answer = self.answer
                     if answer:
                         self.anniversary2024_answer(title_info, answer)
-                        print(f'📝 进行了答题: {answer}')
+                        print(f'进行了答题: {answer}')
         else:
             error_message = response.get('errorMessage') if response else '无返回'
-            print(f'📝 查询每日口令竞猜失败: {error_message}')
+            print(f'查询每日口令竞猜失败: {error_message}')
 
     def anniversary2024_titleList_award(self):
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~anniversary2024GuessService~titleList'
@@ -836,12 +893,12 @@ class RUN:
                 if award_info['answerStatus']:
                     awards = award_info.get('awardList', []) + award_info.get('puzzleList', [])
                     awards_description = ', '.join([f"{award['productName']}" for award in awards])
-                    print(f'🎁 口令竞猜奖励: {awards_description}' if awards_description else '📝 今日无奖励')
+                    print(f'口令竞猜奖励: {awards_description}' if awards_description else '今日无奖励')
                 else:
-                    print('📝 今日还没回答竞猜')
+                    print('今日还没回答竞猜')
         else:
             error_message = response.get('errorMessage') if response else '无返回'
-            print(f'📝 查询每日口令竞猜奖励失败: {error_message}')
+            print(f'查询每日口令竞猜奖励失败: {error_message}')
 
     # 向API发送答题请求
     def anniversary2024_answer(self, answer_info):
@@ -849,11 +906,11 @@ class RUN:
         data = {'period': answer_info['period'], 'answerInfo': answer_info}
         response = self.do_request(url, data)
         if response and response.get('success'):
-            print('📝 口令竞猜回答成功')
+            print('口令竞猜回答成功')
             self.anniversary2024_titleList_award()  # 通过奖励接口验证答案
         else:
             error_message = response.get('errorMessage') if response else '无返回'
-            print(f'📝 口令竞猜回答失败: {error_message}')
+            print(f'口令竞猜回答失败: {error_message}')
 
     # 查询账户状态
     def anniversary2024_queryAccountStatus(self):
@@ -871,7 +928,7 @@ class RUN:
             #     unbox_chance_balance -= 1
         else:
             error_message = result.get('errorMessage') or json.dumps(result) or '无返回'
-            print('📝 查询已收集拼图失败: ' + error_message)
+            print('查询已收集拼图失败: ' + error_message)
 
         result = self.do_request(url)
         if result.get('success'):
@@ -899,14 +956,14 @@ class RUN:
                         self.cards[currency_key] = int(card.get('balance'))
                     card_info.append('[' + card.get('currency') + ']X' + str(card.get('balance')))
 
-                Log(f'📝 已收集拼图: {card_info}')
+                Log(f'已收集拼图: {card_info}')
                 cards_li.sort(key=lambda x: x.get('balance'), reverse=True)
 
             else:
-                print('📝 还没有收集到拼图')
+                print('还没有收集到拼图')
         else:
             error_message = result.get('errorMessage') or json.dumps(result) or '无返回'
-            print('📝 查询已收集拼图失败: ' + error_message)
+            print('查询已收集拼图失败: ' + error_message)
 
     def do_draw(self, cards):
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~anniversary2024CardService~collectDrawAward'
@@ -915,11 +972,11 @@ class RUN:
         if response and response.get('success'):
             data = response.get('obj', {})
             productName = data.get('productName', '')
-            Log(f'🎁 抽奖成功,获得{productName}')
+            Log(f'抽奖成功,获得{productName}')
             return True
         else:
             error_message = response.get('errorMessage') if response else '无返回'
-            print(f'📝 抽奖失败: {error_message}')
+            print(f'抽奖失败: {error_message}')
             return False
 
     def convert_common_card(self, cards, target_card):
@@ -944,7 +1001,7 @@ class RUN:
                 if len(drawn_cards) == n:
                     break
         if len(drawn_cards) == n:
-            "📝 没有足够的卡进行抽奖"
+            "没有足够的卡进行抽奖"
         if self.do_draw(drawn_cards):
             return drawn_cards  # 返回本次抽奖使用的卡
         else:
@@ -953,22 +1010,22 @@ class RUN:
     def simulate_lottery(self, cards):
         while self.can_draw(cards, 9):
             used_cards = self.draw(cards, 9)
-            print("🎁 进行了一次9卡抽奖，消耗卡片: ", used_cards)
+            print("进行了一次9卡抽奖，消耗卡片: ", used_cards)
         while self.can_draw(cards, 7) or self.convert_common_card(cards, 'CARD_1'):
             if not self.can_draw(cards, 7):
                 continue
             used_cards = self.draw(cards, 7)
-            print("🎁 进行了一次7卡抽奖，消耗卡片: ", used_cards)
+            print("进行了一次7卡抽奖，消耗卡片: ", used_cards)
         while self.can_draw(cards, 5) or self.convert_common_card(cards, 'CARD_1'):
             if not self.can_draw(cards, 5):
                 continue
             used_cards = self.draw(cards, 5)
-            print("🎁 进行了一次5卡抽奖，消耗卡片: ", used_cards)
+            print("进行了一次5卡抽奖，消耗卡片: ", used_cards)
         while self.can_draw(cards, 3) or self.convert_common_card(cards, 'CARD_1'):
             if not self.can_draw(cards, 3):
                 continue
             used_cards = self.draw(cards, 3)
-            print("🎁 进行了一次3卡抽奖，消耗卡片: ", used_cards)
+            print("进行了一次3卡抽奖，消耗卡片: ", used_cards)
 
     def anniversary2024_task(self):
         self.anniversary2024_weekly_gift_status()
@@ -981,13 +1038,13 @@ class RUN:
         target_time = datetime(2025, 4, 3, 14, 0)
         # self.simulate_lottery(self.cards)
         if datetime.now() > target_time:
-            print('📅 周年庆活动即将结束，开始自动抽奖')
+            print('周年庆活动即将结束，开始自动抽奖')
             self.simulate_lottery(self.cards)
         else:
-            print('📅 未到自动抽奖时间')
+            print('未到自动抽奖时间')
 
     def member_day_index(self):
-        print('🎭 会员日活动')
+        print('====== 会员日活动 ======')
         try:
             invite_user_id = random.choice([invite for invite in inviteId if invite != self.user_id])
             payload = {'inviteUserId': invite_user_id}
@@ -1000,7 +1057,7 @@ class RUN:
                 if can_receive_invite_award:
                     self.member_day_receive_invite_award(invite_user_id)
                 self.member_day_red_packet_status()
-                Log(f'🎁 会员日可以抽奖{lottery_num}次')
+                Log(f'会员日可以抽奖{lottery_num}次')
                 for _ in range(lottery_num):
                     self.member_day_lottery()
                 if self.member_day_black:
@@ -1011,10 +1068,10 @@ class RUN:
                 self.member_day_red_packet_status()
             else:
                 error_message = response.get('errorMessage', '无返回')
-                Log(f'📝 查询会员日失败: {error_message}')
+                Log(f'查询会员日失败: {error_message}')
                 if '没有资格参与活动' in error_message:
                     self.member_day_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1027,13 +1084,13 @@ class RUN:
             response = self.do_request(url, payload)
             if response.get('success'):
                 product_name = response.get('obj', {}).get('productName', '空气')
-                Log(f'🎁 会员日奖励: {product_name}')
+                Log(f'会员日奖励: {product_name}')
             else:
                 error_message = response.get('errorMessage', '无返回')
-                Log(f'📝 领取会员日奖励失败: {error_message}')
+                Log(f'领取会员日奖励失败: {error_message}')
                 if '没有资格参与活动' in error_message:
                     self.member_day_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1045,13 +1102,13 @@ class RUN:
             response = self.do_request(url, payload)
             if response.get('success'):
                 product_name = response.get('obj', {}).get('productName', '空气')
-                Log(f'🎁 会员日抽奖: {product_name}')
+                Log(f'会员日抽奖: {product_name}')
             else:
                 error_message = response.get('errorMessage', '无返回')
-                Log(f'📝 会员日抽奖失败: {error_message}')
+                Log(f'会员日抽奖失败: {error_message}')
                 if '没有资格参与活动' in error_message:
                     self.member_day_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1083,10 +1140,10 @@ class RUN:
                                 self.member_day_finish_task(task)
             else:
                 error_message = response.get('errorMessage', '无返回')
-                Log('📝 查询会员日任务失败: ' + error_message)
+                Log('查询会员日任务失败: ' + error_message)
                 if '没有资格参与活动' in error_message:
                     self.member_day_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1098,14 +1155,14 @@ class RUN:
 
             response = self.do_request(url, payload)
             if response.get('success'):
-                Log('📝 完成会员日任务[' + task['taskName'] + ']成功')
+                Log('完成会员日任务[' + task['taskName'] + ']成功')
                 self.member_day_fetch_mix_task_reward(task)
             else:
                 error_message = response.get('errorMessage', '无返回')
-                Log('📝 完成会员日任务[' + task['taskName'] + ']失败: ' + error_message)
+                Log('完成会员日任务[' + task['taskName'] + ']失败: ' + error_message)
                 if '没有资格参与活动' in error_message:
                     self.member_day_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1117,13 +1174,13 @@ class RUN:
 
             response = self.do_request(url, payload)
             if response.get('success'):
-                Log('🎁 领取会员日任务[' + task['taskName'] + ']奖励成功')
+                Log('领取会员日任务[' + task['taskName'] + ']奖励成功')
             else:
                 error_message = response.get('errorMessage', '无返回')
-                Log('📝 领取会员日任务[' + task['taskName'] + ']奖励失败: ' + error_message)
+                Log('领取会员日任务[' + task['taskName'] + ']奖励失败: ' + error_message)
                 if '没有资格参与活动' in error_message:
                     self.member_day_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1134,13 +1191,13 @@ class RUN:
 
             response = self.do_request(url, payload)
             if response.get('success'):
-                print(f'🎁 会员日领取{hour}点红包成功')
+                print(f'会员日领取{hour}点红包成功')
             else:
                 error_message = response.get('errorMessage', '无返回')
-                print(f'📝 会员日领取{hour}点红包失败: {error_message}')
+                print(f'会员日领取{hour}点红包失败: {error_message}')
                 if '没有资格参与活动' in error_message:
                     self.member_day_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1170,21 +1227,21 @@ class RUN:
                     if int_level < self.max_level:
                         remaining_needed += 1 << (int_level - 1)
 
-                Log("📝 会员日合成列表: " + ", ".join(packet_summary))
+                Log("会员日合成列表: " + ", ".join(packet_summary))
 
                 if self.member_day_red_packet_map.get(self.max_level):
-                    Log(f"🎁 会员日已拥有[{self.max_level}级]红包X{self.member_day_red_packet_map[self.max_level]}")
+                    Log(f"会员日已拥有[{self.max_level}级]红包X{self.member_day_red_packet_map[self.max_level]}")
                     self.member_day_red_packet_draw(self.max_level)
                 else:
                     remaining = self.packet_threshold - remaining_needed
-                    Log(f"📝 会员日距离[{self.max_level}级]红包还差: [1级]红包X{remaining}")
+                    Log(f"会员日距离[{self.max_level}级]红包还差: [1级]红包X{remaining}")
 
             else:
                 error_message = response.get('errorMessage', '无返回')
-                Log(f'📝 查询会员日合成失败: {error_message}')
+                Log(f'查询会员日合成失败: {error_message}')
                 if '没有资格参与活动' in error_message:
                     self.member_day_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1197,17 +1254,17 @@ class RUN:
 
             response = self.do_request(url, payload)
             if response.get('success'):
-                Log(f'🎁 会员日合成: [{level}级]红包X2 -> [{level + 1}级]红包')
+                Log(f'会员日合成: [{level}级]红包X2 -> [{level + 1}级]红包')
                 self.member_day_red_packet_map[level] -= 2
                 if not self.member_day_red_packet_map.get(level + 1):
                     self.member_day_red_packet_map[level + 1] = 0
                 self.member_day_red_packet_map[level + 1] += 1
             else:
                 error_message = response.get('errorMessage', '无返回')
-                Log(f'📝 会员日合成两个[{level}级]红包失败: {error_message}')
+                Log(f'会员日合成两个[{level}级]红包失败: {error_message}')
                 if '没有资格参与活动' in error_message:
                     self.member_day_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1219,28 +1276,28 @@ class RUN:
             if response and response.get('success'):
                 coupon_names = [item['couponName'] for item in response.get('obj', [])] or []
 
-                Log(f"🎁 会员日提取[{level}级]红包: {', '.join(coupon_names) or '空气'}")
+                Log(f"会员日提取[{level}级]红包: {', '.join(coupon_names) or '空气'}")
             else:
                 error_message = response.get('errorMessage') if response else "无返回"
-                Log(f"📝 会员日提取[{level}级]红包失败: {error_message}")
+                Log(f"会员日提取[{level}级]红包失败: {error_message}")
                 if "没有资格参与活动" in error_message:
                     self.memberDay_black = True
-                    print("📝 会员日任务风控")
+                    print("会员日任务风控")
         except Exception as e:
             print(e)
 
     def DRAGONBOAT_2024_index(self):
-        print('📝 查询财神活动状态')
+        print('====== 查询32周年庆活动状态 ======')
         invite_user_id = random.choice([invite for invite in inviteId if invite != self.user_id])
         try:
-            self.headers['channel'] = '24nzdb'
+            self.headers['channel'] = '32annixcx'
             self.headers[
-                'referer'] = f'https://mcs-mimp-web.sf-express.com/origin/a/mimp-activity/yearEnd2024?mobile={self.mobile}&userId={self.user_id}&path=/origin/a/mimp-activity/yearEnd2024&supportShare=&inviteUserId={invite_user_id}&from=newExpressWX'
+                'referer'] = f'https://mcs-mimp-web.sf-express.com/origin/a/mimp-activity/anniversary2025?mobile={self.mobile}&userId={self.user_id}&path=/origin/a/mimp-activity/anniversary2025&supportShare=&inviteUserId={invite_user_id}&from=newExpressWX'
             payload = {}
-            url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonNoLoginPost/~memberNonactivity~yearEnd2024IndexService~index'
+            url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonNoLoginPost/~memberNonactivity~anniversary2025IndexService~index'
 
             response = self.do_request(url, payload)
-            # print(response)
+            print(response)
             if response.get('success'):
                 obj = response.get('obj', [{}])
                 acEndTime = obj.get('acEndTime', '')
@@ -1250,23 +1307,23 @@ class RUN:
                 # 比较当前时间是否小于比较时间
                 is_less_than = datetime.now() < comparison_time
                 if is_less_than:
-                    print('📝 推财神进行中....')
+                    print('推财神进行中....')
                     return True
                 else:
-                    print('📝 推财神活动已结束')
+                    print('推财神活动已结束')
                     return False
             else:
                 error_message = response.get('errorMessage', '无返回')
                 if '没有资格参与活动' in error_message:
                     self.DRAGONBOAT_2024_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
                 return False
         except Exception as e:
             print(e)
             return False
 
     def DRAGONBOAT_2024_Game_indexInfo(self):
-        Log('🎭 开始推财神游戏')
+        Log('====== 开始推财神游戏 ======')
         try:
             payload = {}
             url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024GameService~indexInfo'
@@ -1286,14 +1343,14 @@ class RUN:
                 error_message = response.get('errorMessage', '无返回')
                 if '没有资格参与活动' in error_message:
                     self.DRAGONBOAT_2024_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
                 return False
         except Exception as e:
             print(e)
             return False
 
     def DRAGONBOAT_2024_Game_init(self):
-        Log('🎭 开始推财神游戏')
+        Log('====== 开始推财神游戏 ======')
         try:
             payload = {}
             url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024GameService~init'
@@ -1313,14 +1370,14 @@ class RUN:
                 error_message = response.get('errorMessage', '无返回')
                 if '没有资格参与活动' in error_message:
                     self.DRAGONBOAT_2024_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
                 return False
         except Exception as e:
             print(e)
             return False
 
     def DRAGONBOAT_2024_weeklyGiftStatus(self):
-        print('📝 查询每周礼包领取状态')
+        print('====== 查询每周礼包领取状态 ======')
         try:
             payload = {}
             url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024IndexService~weeklyGiftStatus'
@@ -1333,21 +1390,21 @@ class RUN:
                     received = gift['received']
                     receiveStartTime = gift['receiveStartTime']
                     receiveEndTime = gift['receiveEndTime']
-                    print(f'📝 领取时间：【{receiveStartTime} 至 {receiveEndTime}】')
+                    print(f'>>> 领取时间：【{receiveStartTime} 至 {receiveEndTime}】')
                     if received:
-                        print('📝 该礼包已领取')
+                        print('> 该礼包已领取')
                         continue
                     receive_start_time = datetime.strptime(receiveStartTime, "%Y-%m-%d %H:%M:%S")
                     receive_end_time = datetime.strptime(receiveEndTime, "%Y-%m-%d %H:%M:%S")
                     is_within_range = receive_start_time <= datetime.now() <= receive_end_time
                     if is_within_range:
-                        print(f'🎁 开始领取礼包：')
+                        print(f'>> 开始领取礼包：')
                         self.DRAGONBOAT_2024_receiveWeeklyGift()
             else:
                 error_message = response.get('errorMessage', '无返回')
                 if '没有资格参与活动' in error_message:
                     self.DRAGONBOAT_2024_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1362,22 +1419,22 @@ class RUN:
             if response.get('success'):
                 obj = response.get('obj', [{}])
                 if obj == [{}]:
-                    print('📝 领取失败')
+                    print('> 领取失败')
                     return False
                 for gifts in obj:
                     productName = gifts['productName']
                     amount = gifts['amount']
-                    print(f'🎁 领取【{productName} x {amount}】成功')
+                    print(f'> 领取【{productName} x {amount}】成功')
             else:
                 error_message = response.get('errorMessage', '无返回')
                 if '没有资格参与活动' in error_message:
                     self.DRAGONBOAT_2024_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
     def DRAGONBOAT_2024_taskList(self):
-        print('📝 查询推币任务列表')
+        print('====== 查询推币任务列表 ======')
         try:
             payload = {
                 "activityCode": "DRAGONBOAT_2024",
@@ -1394,7 +1451,7 @@ class RUN:
                     self.taskName = task['taskName']
                     status = task['status']
                     if status == 3:
-                        Log(f'📝 任务【{self.taskName}】已完成')
+                        Log(f'> 任务【{self.taskName}】已完成')
                         continue
                     self.taskCode = task.get('taskCode', None)
                     if self.taskCode:
@@ -1405,12 +1462,12 @@ class RUN:
                 error_message = response.get('errorMessage', '无返回')
                 if '没有资格参与活动' in error_message:
                     self.DRAGONBOAT_2024_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
     def DRAGONBOAT_2024_coinStatus(self, END=False):
-        Log('📝 查询金币信息')
+        Log('====== 查询金币信息 ======')
         # try:
         payload = {}
         url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024CoinService~coinStatus'
@@ -1438,29 +1495,29 @@ class RUN:
             if END:
                 if PUSH_TIMES_balance > 0:
                     for i in range(PUSH_TIMES_balance):
-                        print(f'📝 开始第【{PUSH_TIMES_balance + 1}】次推币')
+                        print(f'>> 开始第【{PUSH_TIMES_balance + 1}】次推币')
                         self.DRAGONBOAT_2024_pushCoin()
                         PUSH_TIMES -= 1
                         pushedTimesToday += 1
                         pushedTimesTotal += 1
-                Log(f'📝 剩余推币次数：【{PUSH_TIMES}】')
-                Log(f'📝 当前金币：【{self.COIN_balance}】')
+                Log(f'> 剩余推币次数：【{PUSH_TIMES}】')
+                Log(f'> 当前金币：【{self.COIN_balance}】')
                 # Log(f'> 当前发财卡：【{WELFARE_CARD_balance}】')
-                Log(f'📝 今日推币：【{pushedTimesToday}】次')
-                Log(f'📝 总推币：【{pushedTimesTotal}】次')
+                Log(f'> 今日推币：【{pushedTimesToday}】次')
+                Log(f'> 总推币：【{pushedTimesTotal}】次')
             else:
-                print(f'📝 剩余推币次数：【{PUSH_TIMES_balance}】')
-                print(f'📝 当前金币：【{self.COIN_balance}】')
+                print(f'> 剩余推币次数：【{PUSH_TIMES_balance}】')
+                print(f'> 当前金币：【{self.COIN_balance}】')
                 # Log(f'> 当前发财卡：【{WELFARE_CARD_balance}】')
-                print(f'📝 今日推币：【{pushedTimesToday}】次')
-                print(f'📝 总推币：【{pushedTimesTotal}】次')
+                print(f'> 今日推币：【{pushedTimesToday}】次')
+                print(f'> 总推币：【{pushedTimesTotal}】次')
 
             self.DRAGONBOAT_2024_givePushTimes()
         else:
             error_message = response.get('errorMessage', '无返回')
             if '没有资格参与活动' in error_message:
                 self.DRAGONBOAT_2024_black = True
-                Log('📝 会员日任务风控')
+                Log('会员日任务风控')
         # except Exception as e:
         #     print(e)
 
@@ -1475,18 +1532,18 @@ class RUN:
                 obj = response.get('obj', [{}])
                 drawAward = obj.get('drawAward', '')
                 self.COIN_balance += drawAward
-                print(f'📝 获得：【{drawAward}】金币')
+                print(f'> 获得：【{drawAward}】金币')
 
             else:
                 error_message = response.get('errorMessage', '无返回')
                 if '没有资格参与活动' in error_message:
                     self.DRAGONBOAT_2024_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
     def DRAGONBOAT_2024_givePushTimes(self):
-        Log('🎁 领取赠送推币次数')
+        Log('====== 领取赠送推币次数 ======')
         try:
             url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024CoinService~givePushTimes'
 
@@ -1494,12 +1551,12 @@ class RUN:
             # print(response)
             if response.get('success'):
                 obj = response.get('obj', 0)
-                print(f'🎁 获得：【{obj}】次推币机会')
+                print(f'> 获得：【{obj}】次推币机会')
             else:
                 error_message = response.get('errorMessage', '无返回')
                 if '没有资格参与活动' in error_message:
                     self.DRAGONBOAT_2024_black = True
-                    Log('📝 会员日任务风控')
+                    Log('> 会员日任务风控')
                 print(error_message)
         except Exception as e:
             print(e)
@@ -1515,12 +1572,12 @@ class RUN:
             # print(response)
             if response.get('success'):
                 obj = response.get('obj', False)
-                Log(f'📝 完成任务【{self.taskName}】成功')
+                Log(f'> 完成任务【{self.taskName}】成功')
             else:
                 error_message = response.get('errorMessage', '无返回')
                 if '没有资格参与活动' in error_message:
                     self.DRAGONBOAT_2024_black = True
-                    Log('📝 会员日任务风控')
+                    Log('会员日任务风控')
         except Exception as e:
             print(e)
 
@@ -1557,42 +1614,61 @@ class RUN:
 
     def main(self):
         global one_msg
-        wait_time = random.randint(1000, 3000) / 1000.0  
-        time.sleep(wait_time)  
+        wait_time = random.randint(1000, 3000) / 1000.0  # 转换为秒
+        time.sleep(wait_time)  # 等待
         one_msg = ''
         if not self.login_res: return False
-        
-        print('\n' + '='*30 + '🚚 顺丰速运 开始执行 🚚' + '='*30 + '\n')
-        
         # 执行签到任务
         self.sign()
-        self.superWelfare_receiveRedPacket()
+#        self.superWelfare_receiveRedPacket()
         self.get_SignTaskList()
         self.get_SignTaskList(True)
 
         # 执行丰蜜任务
-        self.get_honeyTaskListStart()
         self.honey_indexData()
+        # 获取任务列表并执行任务
+        self.get_honeyTaskListStart()
         self.honey_indexData(True)
 
+
+#        if self.DRAGONBOAT_2024_index():
+            #self.DRAGONBOAT_2024_weeklyGiftStatus()
+            #self.DRAGONBOAT_2024_coinStatus()
+            #self.DRAGONBOAT_2024_taskList()
+#            self.DRAGONBOAT_2024_Game_init()
+            #self.DRAGONBOAT_2024_coinStatus(True)
+
+
+        # #######################################
+        # # # 获取当前季度结束日期
+        # # activity_end_date = get_quarter_end_date()
+        # # if is_activity_end_date(activity_end_date):
+        # #     Log("今天采蜜活动截止兑换，请及时进行兑换")
+        # #     send('顺丰速运挂机通知', "今天采蜜活动截止兑换，请及时进行兑换")
         target_time = datetime(2025, 4, 8, 19, 0)
         if datetime.now() < target_time:
             self.EAR_END_2023_TaskList()
+            self.EAR_END_2023_query()
             #self.anniversary2024_task()
         else:
-            print('🎭 周年庆活动已结束')
-
+            print('周年庆活动已结束')
+        # #######################################
+        # self.member_day_index()
         current_date = datetime.now().day
         if 26 <= current_date <= 28:
             self.member_day_index()
         else:
-            print('⏰ 未到指定时间不执行会员日任务')
-        
-        print('\n' + '='*30 + '🚚 顺丰速运 执行完毕 🚚' + '='*30 + '\n')
-        
+            print('未到指定时间不执行会员日任务')
+
+
+
         self.sendMsg()
         return True
 
+    # def sendMsg(self, help=False):
+    #     if self.send_UID:
+    #         push_res = CHERWIN_TOOLS.wxpusher(self.send_UID, one_msg, APP_NAME, help)
+    #         print(push_res)
     def sendMsg(self, help=False):
           #send("顺丰-通知", one_msg)
           pass
@@ -1656,14 +1732,23 @@ if __name__ == '__main__':
     APP_NAME = '顺丰速运'
     ENV_NAME = 'sfsyUrl'
     CK_NAME = 'url'
+    print(f'''
+       ✨✨✨ TG频道:https://t.me/fxmbb ✨✨✨
+       ✨✨✨ 更新时间2025.3.17✨✨✨
+      点击“积分”，以下几种url之一：
+        https://mcs-mimp-web.sf-express.com/mcs-mimp/share/weChat/shareGiftReceiveRedirect
+        https://mcs-mimp-web.sf-express.com/mcs-mimp/share/app/shareRedirect
+    多账号换行
+    变量名：sfsyUrl
+
+    ''')
     local_script_name = os.path.basename(__file__)
-    local_version = '2025.01.24'
+    local_version = '2024.06.02'
     token = os.getenv(ENV_NAME)
-    # 将分隔符从\n改为&
-    tokens = token.split('&')
+    tokens = token.split('\n')
     # print(tokens)
     if len(tokens) > 0:
-        print(f"\n{'='*30} 🚚 共获取到{len(tokens)}个账号 🚚 {'='*30}\n")
+        print(f"\n>>>>>>>>>>共获取到{len(tokens)}个账号<<<<<<<<<<")
         for index, infos in enumerate(tokens):
             run_result = RUN(infos, index).main()
             if not run_result: continue
