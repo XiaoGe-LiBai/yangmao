@@ -1,3 +1,4 @@
+# 45 57 9,13 * * *
 # 非青龙下在文件开头添加账号配置,
 # process.env.chinaTelecomAccount = `
 # 13454545457#123456
