@@ -1,13 +1,13 @@
-# 45 57 9,13 * * *
 # 非青龙下在文件开头添加账号配置,
 # process.env.chinaTelecomAccount = `
 # 13454545457#123456
 # 13454545457#456789
 # `.trim();
 '''
-变量：chinaTelecomAccount
+变量：jdhf5
 变量格式: 手机号#服务密码
 多号创建多个变量或者换行、&隔开
+cron:45 58 9,13 * * *
 '''
 import requests
 import re
@@ -468,10 +468,10 @@ def main():
     else:
         print("瑞数加密已关闭")
         rs = 0
-    if os.environ.get('jdhf')!= None:
-        chinaTelecomAccount = os.environ.get('jdhf')
+    if os.environ.get('jdhf5')!= None:
+        chinaTelecomAccount = os.environ.get('jdhf5')
     else:
-        chinaTelecomAccount = jdhf
+        chinaTelecomAccount = jdhf5
 
     for i in chinaTelecomAccount.split('&'):
 
@@ -499,7 +499,7 @@ def main():
             printn(f'{phone} 登录失败')
 
 #手机号@密码@wxpusheruid
-jdhf = ""
+jdhf5 = ""
 #重发次数
 cfcs = 15
 #wxpusher推送appToken

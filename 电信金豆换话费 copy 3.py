@@ -4,7 +4,7 @@
 # 13454545457#456789
 # `.trim();
 '''
-变量：jdhf1
+变量：jdhf
 变量格式: 手机号#服务密码
 多号创建多个变量或者换行、&隔开
 cron:45 58 9,13 * * *
@@ -468,10 +468,10 @@ def main():
     else:
         print("瑞数加密已关闭")
         rs = 0
-    if os.environ.get('jdhf1')!= None:
-        chinaTelecomAccount = os.environ.get('jdhf1')
+    if os.environ.get('jdhf')!= None:
+        chinaTelecomAccount = os.environ.get('jdhf')
     else:
-        chinaTelecomAccount = jdhf1
+        chinaTelecomAccount = jdhf
 
     for i in chinaTelecomAccount.split('&'):
 
@@ -499,7 +499,7 @@ def main():
             printn(f'{phone} 登录失败')
 
 #手机号@密码@wxpusheruid
-jdhf1 = ""
+jdhf = ""
 #重发次数
 cfcs = 15
 #wxpusher推送appToken
