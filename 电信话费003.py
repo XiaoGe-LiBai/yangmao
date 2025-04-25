@@ -4,7 +4,7 @@
 # 13454545457#456789
 # `.trim();
 '''
-变量：jdhf7
+变量：jdhf3
 变量格式: 手机号#服务密码
 多号创建多个变量或者换行、&隔开
 cron:45 58 9,13 * * *
@@ -86,7 +86,7 @@ jp = {"9":{},"12":{},"13":{},"23":{}}
 
 
 try:
-    with open('电信金豆换话费007.log') as fr:
+    with open('电信金豆换话费003.log') as fr:
         dhjl = json.load(fr)
 except:
     dhjl = {}
@@ -283,7 +283,7 @@ def exchange(phone,s,title,aid, uid):
                         send(uid, msg)
                     if phone not in dhjl[yf][title]:
                         dhjl[yf][title] += "#"+phone
-                        with open('电信金豆换话费007.log', 'w') as f:
+                        with open('电信金豆换话费003.log', 'w') as f:
                             json.dump(dhjl, f, ensure_ascii=False)
 
 
@@ -468,14 +468,14 @@ def main():
     else:
         print("瑞数加密已关闭")
         rs = 0
-    if os.environ.get('jdhf7')!= None:
-        chinaTelecomAccount = os.environ.get('jdhf7')
+    if os.environ.get('jdhf3')!= None:
+        chinaTelecomAccount = os.environ.get('jdhf3')
     else:
-        chinaTelecomAccount = jdhf7
+        chinaTelecomAccount = jdhf3
 
-    for i in chinaTelecomAccount.split('&'):
+    for i in chinaTelecomAccount.split('\n'):
 
-        i = i.split('@')
+        i = i.split('#')
         phone = i[0]
         password = i[1]
         uid = i[-1]
@@ -499,7 +499,7 @@ def main():
             printn(f'{phone} 登录失败')
 
 #手机号@密码@wxpusheruid
-jdhf7 = ""
+jdhf3 = ""
 #重发次数
 cfcs = 15
 #wxpusher推送appToken
