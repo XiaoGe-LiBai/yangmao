@@ -473,9 +473,9 @@ def main():
     else:
         chinaTelecomAccount = jdhf
 
-    for i in chinaTelecomAccount.split('&'):
+    for i in chinaTelecomAccount.split('\n'):
 
-        i = i.split('@')
+        i = i.split('#')
         phone = i[0]
         password = i[1]
         uid = i[-1]
@@ -498,7 +498,7 @@ def main():
         else:
             printn(f'{phone} 登录失败')
 
-#手机号@密码@wxpusheruid
+#手机号#密码@wxpusheruid
 jdhf = ""
 #重发次数
 cfcs = 15

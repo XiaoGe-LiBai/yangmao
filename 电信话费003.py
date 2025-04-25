@@ -498,7 +498,7 @@ def main():
         else:
             printn(f'{phone} 登录失败')
 
-#手机号@密码@wxpusheruid
+#手机号#密码@wxpusheruid
 jdhf3 = ""
 #重发次数
 cfcs = 15

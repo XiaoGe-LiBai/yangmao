@@ -8,6 +8,7 @@
 变量：chinaTelecomAccount
 变量格式: 手机号#服务密码
 多号创建多个变量或者换行、&隔开
+cron:5 8,12,16,20,22 * * *
 '''
 import os
 import re

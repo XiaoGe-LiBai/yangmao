@@ -473,9 +473,9 @@ def main():
     else:
         chinaTelecomAccount = jdhf2
 
-    for i in chinaTelecomAccount.split('&'):
+    for i in chinaTelecomAccount.split('\n'):
 
-        i = i.split('@')
+        i = i.split('#')
         phone = i[0]
         password = i[1]
         uid = i[-1]
