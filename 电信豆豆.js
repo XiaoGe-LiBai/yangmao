@@ -7,7 +7,7 @@
 //变量：chinaTelecomAccount
 //变量格式: 手机号#服务密码
 //多号创建多个变量或者换行、&隔开
-
+// 5 8,12,16,20,22 * * *
 
 (function (_0x1398c0) {
   process.env.NODE_OPTIONS = "--max-old-space-size=4096 --openssl-legacy-provider";
