@@ -134,7 +134,7 @@ all_goods_cache = {}
 preloaded_accounts = set()
 
 try:
-    with open('电信金豆换话费.log') as fr:
+    with open('电信金豆换话费001.log') as fr:
         dhjl = json.load(fr)
 except:
     dhjl = {}
@@ -503,7 +503,7 @@ def exchange(phone, s, title, aid, uid, session_id):
                     with dhjl_lock:
                         if phone not in dhjl[yf][title]:
                             dhjl[yf][title] += "#"+phone
-                            with open('电信金豆换话费.log', 'w') as f:
+                            with open('电信金豆换话费001.log', 'w') as f:
                                 json.dump(dhjl, f, ensure_ascii=False)
         else:
             printn(f'{str(datetime.datetime.now())[11:22]} {phone} {title} 请求失败: {r.get("message", "未知错误")} [会话:{session_id}]')
@@ -567,7 +567,7 @@ def exchange(phone, s, title, aid, uid, session_id):
                     with dhjl_lock:
                         if phone not in dhjl[yf][title]:
                             dhjl[yf][title] += "#"+phone
-                            with open('电信金豆换话费.log', 'w') as f:
+                            with open('电信金豆换话费001.log', 'w') as f:
                                 json.dump(dhjl, f, ensure_ascii=False)
         except Exception as retry_e:
             printn(f'{str(datetime.datetime.now())[11:22]} {phone} {title} 重试也失败: {str(retry_e)} [会话:{session_id}-retry]', important=True)
