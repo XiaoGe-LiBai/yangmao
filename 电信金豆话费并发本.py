@@ -917,7 +917,7 @@ def main():
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_account_workers) as executor:
         futures = []
  #       chinaTelecomAccount = ''
-        for i in chinaTelecomAccount.split('&'):
+        for i in chinaTelecomAccount.split('\n'):
             i = i.split('#')
             phone = i[0]
             password = i[-1]
