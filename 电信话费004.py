@@ -7,7 +7,7 @@
 变量：jdhf4
 变量格式: 手机号#服务密码
 多号创建多个变量或者换行、&隔开
-cron:45 58 9,13 * * *
+cron:45 59 9,13 * * *
 '''
 import requests
 import re
