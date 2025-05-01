@@ -8,7 +8,6 @@
 变量：chinaTelecomAccount
 变量格式: 手机号#服务密码
 多号创建多个变量或者换行、&隔开
-
 '''
 import os
 import re
@@ -671,13 +670,21 @@ async def main(isTrue):
 
 
 
-WELFARE_CODE=os.environ.get('dx_kl') or "五一福利"
+WELFARE_CODE=os.environ.get('dx_kl') or "心有灵犀,绑定福利,事事如意,2025加油,草长莺飞,888,年末狂欢,年末回馈"
 WELFARE_CODES = WELFARE_CODE.split(',') 
 
 # 处理账号字符串，移除空行并清理每行的空白字符
-phone_list = [line.strip() for line in chinaTelecomAccount.split('\n') if line.strip()]
+import os
 
-PHONES = os.environ.get('chinaTelecomAccount') or os.environ.get('PHONES1') or '\n'.join(phone_list)
+# 尝试从环境变量中获取 chinaTelecomAccount
+chinaTelecomAccount = os.environ.get('chinaTelecomAccount')
+
+if not chinaTelecomAccount:
+    print("chinaTelecomAccount 未定义，使用默认值或退出程序")
+    chinaTelecomAccount = "1234567890\n9876543210\n1122334455"  # 示例默认值
+
+phone_list = [line.strip() for line in chinaTelecomAccount.split('\n') if line.strip()]
+PHONES = os.environ.get('PHONES1') or '\n'.join(phone_list)
 
 if __name__ == "__main__":
     pd.set_option('display.max_columns', None)
