@@ -671,7 +671,7 @@ async def main(isTrue):
 
 
 
-WELFARE_CODE=os.environ.get('dx_kl') or ""
+WELFARE_CODE=os.environ.get('dx_kl') or "五一福利"
 WELFARE_CODES = WELFARE_CODE.split(',') 
 
 # 处理账号字符串，移除空行并清理每行的空白字符
