@@ -2118,7 +2118,7 @@ if __name__ == '__main__':
     ENV_NAME = 'sfsyUrl'
     CK_NAME = 'url'
     token = os.getenv(ENV_NAME)
-    tokens = token.split('&')
+    tokens = token.split('\n')
     local_version = '2024.06.02'
     all_logs = []
     if len(tokens) > 0:
