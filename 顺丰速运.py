@@ -2117,6 +2117,15 @@ if __name__ == '__main__':
     APP_NAME = '顺丰速运'
     ENV_NAME = 'sfsyUrl'
     CK_NAME = 'url'
+    print(f'''
+       ✨✨✨ 更新时间2025.5.16✨✨✨
+      点击“积分”，以下几种url之一：
+        https://mcs-mimp-web.sf-express.com/mcs-mimp/share/weChat/shareGiftReceiveRedirect
+        https://mcs-mimp-web.sf-express.com/mcs-mimp/share/app/shareRedirect
+    多账号换行
+    变量名：sfsyUrl
+
+    ''')
     token = os.getenv(ENV_NAME)
     tokens = token.split('\n')
     local_version = '2024.06.02'
