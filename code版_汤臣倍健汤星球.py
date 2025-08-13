@@ -22,6 +22,11 @@ import os
 import sys
 import traceback
 
+# --- 脚本配置 ---
+MULTI_ACCOUNT_SPLIT = ["\n", "@", "#"]
+MULTI_ACCOUNT_PROXY = False 
+NOTIFY = os.getenv("LY_NOTIFY") or False 
+
 # --- 导入或下载微信协议适配器 (wechatCodeAdapter.py) ---
 # (此部分为标准代码，确保脚本可以找到并使用适配器)
 if "miniapp" not in os.path.abspath(__file__):
@@ -41,10 +46,6 @@ if not os.path.exists(wechat_adapter_path):
         exit(1)
 from wechatCodeAdapter import WechatCodeAdapter # type: ignore
 
-# --- 脚本配置 ---
-MULTI_ACCOUNT_SPLIT = ["\n", "@", "#"]
-MULTI_ACCOUNT_PROXY = False 
-NOTIFY = os.getenv("LY_NOTIFY") or False 
 
 class AutoTask:
     def __init__(self, script_name):
@@ -256,4 +257,4 @@ class AutoTask:
 
 if __name__ == "__main__":
     auto_task = AutoTask("汤臣倍健汤星球")
-    auto_task.run()```
+    auto_task.run()
